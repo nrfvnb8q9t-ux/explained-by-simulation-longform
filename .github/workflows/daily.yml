@@ -75,16 +75,22 @@ jobs:
         continue-on-error: true   # a bad Claude day still uploads from the reserve
         timeout-minutes: 170
         env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          CLAUDE_TOKEN_RAW: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           YOUTUBE_API_KEY: ${{ fromJSON(secrets.ESIM_SECRETS).YOUTUBE_API_KEY }}
         run: |
+          # a token copied from a terminal can pick up line breaks where it wrapped; strip all whitespace
+          export CLAUDE_CODE_OAUTH_TOKEN="$(printf '%s' "$CLAUDE_TOKEN_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$CLAUDE_CODE_OAUTH_TOKEN"
           mkdir -p data/logs
           claude -p "$(cat prompts/daily.md)" \
             --permission-mode acceptEdits \
             --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(uv run:*),Bash(python3:*),Bash(curl:*),Bash(ls:*),Bash(mkdir:*)" \
             --max-turns 400 \
-            > "data/logs/claude-$(date +%F).log" 2>&1
+            > "data/logs/claude-$(date +%F).log" 2>&1 || status=$?
+          # never keep a credential in the log if an error message quotes one
+          sed -i -E 's/sk-ant-[A-Za-z0-9_-]+/[token removed]/g' "data/logs/claude-$(date +%F).log"
           tail -n 1 "data/logs/claude-$(date +%F).log" | grep -E '^done:' || echo "Claude finished (summary in the vault log)"
+          exit ${status:-0}
 
       - name: Render, check and upload
         env:
