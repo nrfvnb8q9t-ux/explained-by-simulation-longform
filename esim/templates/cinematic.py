@@ -5,33 +5,56 @@ import math
 import numpy as np
 import skia
 
-from esim.templates import Sfx, accent, body, pick, rand, shot_camera, template, when
+from esim.templates import BODY_KINDS, Sfx, accent, body, pick, rand, shot_camera, template, when
 from esim.engine import *  # noqa: F401,F403
 
 
 @template("title_card", kind="cinematic", sfx=lambda p: [Sfx("reverse", 0.0, dur=0.6), Sfx("808", 0.6), Sfx("whoosh", "end", offset=-0.8, gain_db=-6)])
 def title_card(f, p):
-    """A chapter title: big text slamming in over a glowing nebula and drifting particles.
-    params: title, number (chapter number, optional), sub, color, style (slam|type|glitch)"""
+    """A chapter title: big text slamming in over a glowing nebula and drifting particles, then a slow push-in
+    with beat-pulsing glow, light sweeps and the chapter's planet rising behind it, so it never sits still.
+    params: title, number (chapter number, optional), sub, color, style (slam|type|glitch), kind (body behind it, optional)"""
     gradient_bg(f)
     nebula_glow(f, alpha=0.6)
-    starfield(f, n=300, drift=(-14, 0))
+    starfield(f, n=300, drift=(-14 - 30 * f.p, 0))
     c_ = accent(f, p)
-    style = p("style") or pick(f, "tstyle", ["slam", "type", "glitch"])
-    if p("number") is not None:
-        text(f, f"CHAPTER {p('number')}", 960, 400, size=40, color=c_, weight="semibold", a=f.prog(0.2, 0.4))
-    title = p("title", "Chapter")
-    if style == "slam":
-        slam_text(f, title.upper(), 960, 540, 0.6, size=150 if len(title) < 14 else 110, glow_color=c_, snap=False)
-    elif style == "type":
-        text(f, title.upper(), 960, 590, size=140 if len(title) < 14 else 100, glow_color=c_,
-             reveal=f.prog(0.4, 1.0, ease=lambda v: clamp(v)), stroke=8)
-    else:
-        jit = 14 * math.exp(-max(f.t - 0.6, 0) * 4) * math.sin(f.t * 70)
-        for dx, colr, a in ((-6 - jit, RED, 0.6), (6 + jit, CYAN, 0.6), (0, INK, 1)):
-            text(f, title.upper(), 960 + dx, 590, size=140 if len(title) < 14 else 100, color=colr, a=a * f.prog(0.4, 0.2))
-    if p("sub"):
-        text(f, p("sub"), 960, 700, size=44, color=DIM, weight="semibold", a=f.prog(1.2, 0.5))
+    kind = p("kind")
+    if kind is None:  # "Number Nine: Earth" -> Earth rises behind the title
+        words = [w.strip(":,.!?").lower() for w in p("title", "").split()]
+        kind = next((w for w in reversed(words) if w in BODY_KINDS and w not in ("rocky", "gas", "ice", "star")), None)
+    pulse = f.beat_pulse() if hasattr(f, "beat_pulse") else 0.0
+    zoom = 1.0 + 0.10 * ease_in_out(f.p)
+    with camera(f, 960, 540, zoom=zoom, rotate=lerp(-1.2, 1.2, f.p)):
+        if kind:
+            # a huge planet rising up from the bottom edge, its top arc staying below the subtitle
+            r = 560 + 20 * pulse
+            body(f, kind, 960 + lerp(-80, 80, f.p), lerp(1700, 1360, ease_out(f.prog(0.3, 3.0))), r,
+                 alpha=0.75 * f.prog(0.3, 1.2))
+        soft_light(f, 960, 540, 700, c_, 0.12 + 0.18 * pulse)
+        # a light sweep across the title every few seconds
+        sweep = (f.t % 4.0) / 4.0
+        soft_light(f, lerp(200, 1720, sweep), 560, 260, INK, 0.10 * math.sin(math.pi * sweep))
+        rng = f.rng("tc_sparks")
+        n = 60
+        sx, sp = rng.random(n) * 1920, 40 + rng.random(n) * 80
+        sy = (rng.random(n) * 1100 - f.t * sp) % 1100
+        dots(f, sx, sy, 2 + rng.random(n) * 3, 0.5, color=c_)
+        if p("number") is not None:
+            text(f, f"CHAPTER {p('number')}", 960, 400, size=40, color=c_, weight="semibold", a=f.prog(0.2, 0.4))
+        title = p("title", "Chapter")
+        size = 150 if len(title) < 14 else 110
+        style = p("style") or pick(f, "tstyle", ["slam", "type", "glitch"])
+        if style == "slam":
+            slam_text(f, title.upper(), 960, 540, 0.6, size=size, glow_color=c_, snap=False)
+        elif style == "type":
+            text(f, title.upper(), 960, 590, size=size - 10, glow_color=c_,
+                 reveal=f.prog(0.4, 1.0, ease=lambda v: clamp(v)), stroke=8)
+        else:
+            jit = 14 * math.exp(-max(f.t - 0.6, 0) * 4) * math.sin(f.t * 70) + 6 * pulse
+            for dx, colr, a in ((-6 - jit, RED, 0.6), (6 + jit, CYAN, 0.6), (0, INK, 1)):
+                text(f, title.upper(), 960 + dx, 590, size=size - 10, color=colr, a=a * f.prog(0.4, 0.2))
+        if p("sub"):
+            text(f, p("sub"), 960, 700, size=44, color=DIM, weight="semibold", a=f.prog(1.2, 0.5))
 
 
 @template("kinetic_text", kind="cinematic", sfx=lambda p: [Sfx("pop", w.get("at", 0.3 + i * 0.35), gain_db=-4) for i, w in enumerate(p("words", [])[:8])])
@@ -172,10 +195,12 @@ def warp(f, p):
         f.c.drawLine(x0, y0, x1, y1, paint(colr, 0.3 + 0.7 * float(z[i]), stroke=1 + 2 * float(z[i])))
     soft_light(f, 960, 540, 300, c_, 0.3 * speed)
     if f.t > arrive:
-        if p("kind"):
-            body(f, p("kind"), 960, 540, 260 * ease_back(f.prog(arrive, 0.6)), light=(-0.6, -0.3, 0.7))
+        kind = p("kind") or ((p("destination") or "").strip().lower().replace(" ", "_") or None)
+        if kind in BODY_KINDS:  # arriving at a named planet: it swells into view and keeps slowly growing
+            grow = ease_back(f.prog(arrive, 0.6)) * (1 + 0.08 * f.prog(arrive, max(f.dur - arrive, 0.1)))
+            body(f, kind, 960, 470, 280 * grow, light=(-0.6, -0.3, 0.7))
         if p("destination"):
-            slam_text(f, p("destination").upper(), 960, 880, arrive + 0.2, size=110, glow_color=c_, snap=False)
+            slam_text(f, p("destination").upper(), 960, 820, arrive + 0.2, size=100, glow_color=c_, snap=False)
     flash(f, arrive, dur=0.4, peak=0.7)
 
 
