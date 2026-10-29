@@ -67,16 +67,25 @@ def upload(meta):
     return video_id
 
 
+SECRETS_FILE = ".yt-secrets.json"  # local only (gitignored); values go into GitHub secrets
+
+
 def auth(client_secret_path):
+    """Sign in once in the browser and save the three YouTube secrets to .yt-secrets.json (not printed,
+    so they never end up in a terminal log)."""
     from google_auth_oauthlib.flow import InstalledAppFlow
     flow = InstalledAppFlow.from_client_secrets_file(client_secret_path, SCOPES)
-    creds = flow.run_local_server(port=0, prompt="consent", access_type="offline")
+    creds = flow.run_local_server(port=0, prompt="consent", access_type="offline",
+                                  success_message="Done! You can close this tab and go back to Claude.")
     info = json.load(open(client_secret_path))
     info = info.get("installed") or info.get("web")
-    print("\nSave these as GitHub repository secrets (Settings > Secrets and variables > Actions):\n")
-    print(f"YT_CLIENT_ID      = {info['client_id']}")
-    print(f"YT_CLIENT_SECRET  = {info['client_secret']}")
-    print(f"YT_REFRESH_TOKEN  = {creds.refresh_token}")
+    secrets = {"YT_CLIENT_ID": info["client_id"], "YT_CLIENT_SECRET": info["client_secret"],
+               "YT_REFRESH_TOKEN": creds.refresh_token}
+    with open(SECRETS_FILE, "w") as f:
+        json.dump(secrets, f)
+    os.chmod(SECRETS_FILE, 0o600)
+    print(f"Signed in. Saved YT_CLIENT_ID, YT_CLIENT_SECRET and YT_REFRESH_TOKEN to {SECRETS_FILE} "
+          "(kept out of git). Add them as GitHub repository secrets.")
 
 
 if __name__ == "__main__":

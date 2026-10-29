@@ -22,3 +22,4 @@ __pycache__/
 music/
 .ntfy-topic
 KEEP-MAC-AWAKE.txt
+.yt-secrets.json

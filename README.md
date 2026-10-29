@@ -77,15 +77,14 @@ library. To drop a track you've gone off, delete it from `music/` and from `musi
 **6. Phone notifications.** Install the **ntfy** app and subscribe to the topic name in the `.ntfy-topic` file
 (it's random so nobody else can guess it). That's `NTFY_TOPIC`.
 
-**7. GitHub secrets.** Repo > Settings > Secrets and variables > Actions > New repository secret, one for each:
+**7. GitHub secrets (just two).** Repo > Settings > Secrets and variables > Actions > New repository secret:
 
 | Secret | Where it comes from |
 |---|---|
-| `CONTENT_KEY` | the `.content-key` file in this folder (never share it, and keep a backup: without it the vault can't be opened) |
+| `ESIM_SECRETS` | run `uv run python -m esim.github_secrets`: it bundles the vault key, YouTube tokens, research key and ntfy topic and puts them on your clipboard |
 | `CLAUDE_CODE_OAUTH_TOKEN` | step 5 |
-| `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` | step 4 |
-| `YOUTUBE_API_KEY` | step 4.5 |
-| `NTFY_TOPIC` | step 6 |
+
+Keep a backup of the `.content-key` file somewhere safe: without it the encrypted vault can't be opened.
 
 **8. First run.** Repo > Actions > **daily-video** > Run workflow, with *dry run* ticked. When that works, run it
 again without dry run and check that a private video appears in YouTube Studio. After that it runs by itself every

@@ -1,12 +1,11 @@
 # Every morning: Claude tops up the reserve of scripts, then TWO finished videos are rendered, checked
 # for uniqueness and uploaded to YouTube as PRIVATE. You get a phone notification to review it.
 #
-# Secrets (Settings > Secrets and variables > Actions):
-#   CONTENT_KEY               unlocks vault.tar.enc (uv run python -m esim.vault newkey)
+# Secrets (Settings > Secrets and variables > Actions), just two:
+#   ESIM_SECRETS              one JSON bundle: CONTENT_KEY, YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN,
+#                             YOUTUBE_API_KEY, NTFY_TOPIC (built on the Mac by `uv run python -m esim.github_secrets`)
 #   CLAUDE_CODE_OAUTH_TOKEN   from `claude setup-token`, uses your Claude Max plan
-#   YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN   from `uv run python -m esim.youtube auth ...`
-#   YOUTUBE_API_KEY           free key for outlier research
-#   NTFY_TOPIC                your private ntfy topic name for phone notifications
+# Each step only gets the values it needs (the Claude step never sees the YouTube upload tokens).
 #
 # This repo is public, so nothing here may print script content. Claude's and the renderer's output
 # goes to log files inside the encrypted vault, not to this run's public log.
@@ -66,7 +65,7 @@ jobs:
       - name: Unlock the vault
         id: unlock
         env:
-          CONTENT_KEY: ${{ secrets.CONTENT_KEY }}
+          CONTENT_KEY: ${{ fromJSON(secrets.ESIM_SECRETS).CONTENT_KEY }}
         run: |
           uv run python -m esim.vault unlock
           echo "ok=true" >> "$GITHUB_OUTPUT"
@@ -77,7 +76,7 @@ jobs:
         timeout-minutes: 170
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_API_KEY: ${{ fromJSON(secrets.ESIM_SECRETS).YOUTUBE_API_KEY }}
         run: |
           mkdir -p data/logs
           claude -p "$(cat prompts/daily.md)" \
@@ -89,16 +88,16 @@ jobs:
 
       - name: Render, check and upload
         env:
-          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          YT_CLIENT_ID: ${{ fromJSON(secrets.ESIM_SECRETS).YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ fromJSON(secrets.ESIM_SECRETS).YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ fromJSON(secrets.ESIM_SECRETS).YT_REFRESH_TOKEN }}
+          NTFY_TOPIC: ${{ fromJSON(secrets.ESIM_SECRETS).NTFY_TOPIC }}
         run: uv run python -m esim.daily ${{ inputs.dry_run && '--dry-run' || '' }}
 
       - name: Save the vault
         if: ${{ always() && steps.unlock.outputs.ok == 'true' }}
         env:
-          CONTENT_KEY: ${{ secrets.CONTENT_KEY }}
+          CONTENT_KEY: ${{ fromJSON(secrets.ESIM_SECRETS).CONTENT_KEY }}
         run: |
           uv run python -m esim.vault lock
           git config user.name "explained-by-simulation-bot"
@@ -110,5 +109,5 @@ jobs:
       - name: Tell the phone if the run failed
         if: ${{ failure() }}
         env:
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOPIC: ${{ fromJSON(secrets.ESIM_SECRETS).NTFY_TOPIC }}
         run: uv run python -c "from esim import notify; notify.send('Daily run failed', 'Open the GitHub Actions page for details.', priority='high', tags=('warning',))"
