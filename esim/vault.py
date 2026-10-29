@@ -61,6 +61,14 @@ def unlock():
     unlock_music()
 
 
+def read_member(name):
+    """Read one file out of the vault without unpacking everything (or the music)."""
+    data = Fernet(_key()).decrypt(VAULT.read_bytes())
+    with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tar:
+        member = tar.extractfile(name)
+        return member.read() if member else None
+
+
 def _music_index(fernet):
     path = MUSIC_VAULT / "index.enc"
     return json.loads(fernet.decrypt(path.read_bytes())) if path.exists() else {"files": {}, "library": None}

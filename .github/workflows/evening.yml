@@ -1,0 +1,39 @@
+# 7pm UK every evening: one phone notification saying today's long videos are uploaded and ready to publish.
+# GitHub's schedules are in UTC, so this fires at 18:00 and 19:00 UTC and esim.evening only sends when it's
+# 7pm in London (19:00 UTC in winter, 18:00 UTC in summer). GitHub can start scheduled runs a few minutes late.
+
+name: evening-message
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+    - cron: "0 19 * * *"
+  workflow_dispatch:
+    inputs:
+      now:
+        description: "Send the message now, whatever the time"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  message:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            esim
+            vault.tar.enc
+          sparse-checkout-cone-mode: false
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Send the 7pm message
+        env:
+          CONTENT_KEY: ${{ fromJSON(secrets.ESIM_SECRETS).CONTENT_KEY }}
+          NTFY_TOPIC: ${{ fromJSON(secrets.ESIM_SECRETS).NTFY_TOPIC }}
+        run: uv run --no-project --python 3.12 --with cryptography python -m esim.evening ${{ inputs.now && '--now' || '' }}

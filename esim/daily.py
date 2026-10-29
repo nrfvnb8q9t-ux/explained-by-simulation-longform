@@ -10,7 +10,8 @@ import json
 import shutil
 import subprocess
 import sys
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from esim import notify
@@ -20,6 +21,7 @@ QUEUE = ROOT / "plan" / "queue.json"
 LOG = ROOT / "content-log.md"
 VIDEOS_PER_DAY = 2
 RESERVE_WARN = 6
+UK = ZoneInfo("Europe/London")
 
 
 def load_queue():
@@ -93,18 +95,13 @@ def main():
                         "If this says invalid_grant, the YouTube sign-in needs redoing (see README).",
                         priority="high", tags=("warning",))
             raise
-        item.update(status="uploaded", video_id=video_id, uploaded=str(date.today()))
+        item.update(status="uploaded", video_id=video_id, uploaded=str(datetime.now(UK).date()), title=meta["title"])
         save_queue(queue)
         with open(LOG, "a") as f:
             f.write(f"{date.today()} | {item['slug']} | {item.get('format', '')} | "
                     f"hook {item.get('hook_formula', '')} | {meta['title']} | {video_id}\n")
         made += 1
-        left = sum(1 for i in queue if is_ready(i))
-        note = f"\nOnly {left} scripts left in reserve." if left < RESERVE_WARN else f"\n{left} scripts in reserve."
-        notify.send(f"New video ready to review ({made}/{args.count})",
-                    f"\"{meta['title']}\" ({meta['duration'] / 60:.0f} min) is uploaded as private. "
-                    f"Tap to check it, then set it to Public.{note}",
-                    url=f"https://studio.youtube.com/video/{video_id}/edit", tags=("movie_camera",))
+        # the "ready to publish" message is sent once, at 7pm, by esim.evening (see .github/workflows/evening.yml)
         shutil.rmtree(ROOT / "build" / item["slug"], ignore_errors=True)  # free disk space for the next render
 
     if made < args.count:
