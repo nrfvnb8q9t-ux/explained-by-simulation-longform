@@ -1,0 +1,24 @@
+# Private content: only the encrypted vault.tar.enc is committed
+videos/
+plan/
+research/
+data/
+content-log.md
+
+# Secrets
+.content-key
+.env
+client_secret*.json
+*.token
+
+# Generated
+build/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Audio Library tracks: only the encrypted music.vault/ is committed
+music/
+.ntfy-topic
+KEEP-MAC-AWAKE.txt

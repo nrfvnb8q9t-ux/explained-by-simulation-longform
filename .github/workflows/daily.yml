@@ -1,0 +1,114 @@
+# Every morning: Claude tops up the reserve of scripts, then TWO finished videos are rendered, checked
+# for uniqueness and uploaded to YouTube as PRIVATE. You get a phone notification to review it.
+#
+# Secrets (Settings > Secrets and variables > Actions):
+#   CONTENT_KEY               unlocks vault.tar.enc (uv run python -m esim.vault newkey)
+#   CLAUDE_CODE_OAUTH_TOKEN   from `claude setup-token`, uses your Claude Max plan
+#   YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN   from `uv run python -m esim.youtube auth ...`
+#   YOUTUBE_API_KEY           free key for outlier research
+#   NTFY_TOPIC                your private ntfy topic name for phone notifications
+#
+# This repo is public, so nothing here may print script content. Claude's and the renderer's output
+# goes to log files inside the encrypted vault, not to this run's public log.
+
+name: daily-video
+
+on:
+  schedule:
+    - cron: "0 5 * * *"   # 05:00 UTC (6am UK summer time / 5am winter)
+  workflow_dispatch:
+    inputs:
+      skip_claude:
+        description: "Skip the Claude writing step (just render and upload from the reserve)"
+        type: boolean
+        default: false
+      dry_run:
+        description: "Render and check, but don't upload"
+        type: boolean
+        default: false
+
+concurrency:
+  group: daily-video
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  make-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355   # GitHub allows 360; Claude ~2.5 h max, then 2 renders ~1.5 h
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: System libraries for the renderer
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libegl1 libgl1 libfontconfig1 > /dev/null
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache the voice model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: kokoro-82m-v1
+
+      - name: Install
+        run: |
+          uv sync --frozen
+          npm install -g @anthropic-ai/claude-code > /dev/null
+
+      - name: Unlock the vault
+        id: unlock
+        env:
+          CONTENT_KEY: ${{ secrets.CONTENT_KEY }}
+        run: |
+          uv run python -m esim.vault unlock
+          echo "ok=true" >> "$GITHUB_OUTPUT"
+
+      - name: Claude writes and animates scripts
+        if: ${{ !inputs.skip_claude }}
+        continue-on-error: true   # a bad Claude day still uploads from the reserve
+        timeout-minutes: 170
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          mkdir -p data/logs
+          claude -p "$(cat prompts/daily.md)" \
+            --permission-mode acceptEdits \
+            --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(uv run:*),Bash(python3:*),Bash(curl:*),Bash(ls:*),Bash(mkdir:*)" \
+            --max-turns 400 \
+            > "data/logs/claude-$(date +%F).log" 2>&1
+          tail -n 1 "data/logs/claude-$(date +%F).log" | grep -E '^done:' || echo "Claude finished (summary in the vault log)"
+
+      - name: Render, check and upload
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: uv run python -m esim.daily ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Save the vault
+        if: ${{ always() && steps.unlock.outputs.ok == 'true' }}
+        env:
+          CONTENT_KEY: ${{ secrets.CONTENT_KEY }}
+        run: |
+          uv run python -m esim.vault lock
+          git config user.name "explained-by-simulation-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add vault.tar.enc music.vault
+          git diff --cached --quiet || git commit -q -m "Daily update $(date +%F)"
+          git push -q
+
+      - name: Tell the phone if the run failed
+        if: ${{ failure() }}
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: uv run python -c "from esim import notify; notify.send('Daily run failed', 'Open the GitHub Actions page for details.', priority='high', tags=('warning',))"
