@@ -96,7 +96,7 @@ a few days to a few weeks.
 
 ## Day to day
 
-- **Every morning:** two notifications say "New video ready to review". Tap each, watch it, set it to Public.
+- **Every evening at 7pm (UK):** one notification says both long videos are uploaded and ready to publish, with a link to each. Check them, then set them to Public. (Videos are made earlier in the day by the 05:00 UTC run; the message is sent by the `evening-message` workflow.)
 - **Claude keeps a reserve of 10 finished videos** (5 days), writing up to 3 new ones a day, so a bad day never stops uploads.
 - **Warnings you might get:** "Only N scripts left" (Claude has been failing, so check the Actions log), "Upload
   failed: invalid_grant" (redo step 4.4 and update `YT_REFRESH_TOKEN`), "music library is empty" (step 2).

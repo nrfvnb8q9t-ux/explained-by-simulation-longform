@@ -118,9 +118,10 @@ you write the shots.
     ]
   },
   "sources": [{"claim": "...", "url": "..."}],
-  "ai_disclosure": true
+  "realistic_content": false
 }
 ```
+Leave `"realistic_content": false`. This channel's videos are clearly animated simulations with a generic narrator, which YouTube doesn't require an AI label for. Only set it to `true` if a video shows something realistic enough to be mistaken for real footage of a real person, event or place.
 The slug is lowercase words joined by hyphens, and it must be new (check `videos/` and `content-log.md`).
 Set `"voice"` to the narrator voice named in `channel.md` (currently `am_puck`).
 

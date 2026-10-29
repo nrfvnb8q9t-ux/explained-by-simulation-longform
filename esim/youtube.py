@@ -38,7 +38,8 @@ def upload(meta):
                     "tags": meta.get("tags", [])[:30], "categoryId": SCIENCE_AND_TECH,
                     "defaultLanguage": "en", "defaultAudioLanguage": "en"},
         "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False,
-                   "containsSyntheticMedia": bool(meta.get("ai_disclosure", True))},
+                   "containsSyntheticMedia": bool(meta.get("ai_disclosure", False)),
+                   "embeddable": True, "publicStatsViewable": True, "license": "youtube"},
     }
     media = MediaFileUpload(meta["video"], mimetype="video/mp4", chunksize=16 * 1024 * 1024, resumable=True)
     req = yt.videos().insert(part="snippet,status", body=body, media_body=media)
@@ -53,12 +54,6 @@ def upload(meta):
             print(f"upload retry {retries}: {e}")
             time.sleep(2 ** retries)
     video_id = response["id"]
-    if meta.get("ai_disclosure", True):  # set the altered/synthetic content label explicitly as well
-        try:
-            yt.videos().update(part="status", body={"id": video_id, "status": {
-                "privacyStatus": "private", "selfDeclaredMadeForKids": False, "containsSyntheticMedia": True}}).execute()
-        except Exception as e:
-            print(f"AI-content label not set ({e}); tick 'Altered content' in YouTube Studio.")
 
     try:
         yt.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(meta["thumbnail"])).execute()

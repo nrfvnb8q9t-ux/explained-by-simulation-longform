@@ -329,7 +329,7 @@ def main():
         desc += "\n\nMusic\n" + "\n".join(needed)
     desc += "\n\nAnimations are simulations and illustrations made for this video, not real footage."
     meta = {"slug": slug, "title": spec["titles"][0], "description": desc, "tags": spec.get("tags", []),
-            "duration": round(total, 2), "ai_disclosure": script.get("ai_disclosure", True), "music": tracks,
+            "duration": round(total, 2), "ai_disclosure": bool(script.get("realistic_content", False)), "music": tracks,
             "video": str(final), "thumbnail": str(out_dir / "thumbnail.jpg"), "captions": str(out_dir / "captions.srt")}
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2))
     if usage is not None and not args.preview:
