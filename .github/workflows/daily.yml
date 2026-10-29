@@ -82,15 +82,26 @@ jobs:
           export CLAUDE_CODE_OAUTH_TOKEN="$(printf '%s' "$CLAUDE_TOKEN_RAW" | tr -d '[:space:]')"
           echo "::add-mask::$CLAUDE_CODE_OAUTH_TOKEN"
           mkdir -p data/logs
-          claude -p "$(cat prompts/daily.md)" \
-            --permission-mode acceptEdits \
-            --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(uv run:*),Bash(python3:*),Bash(curl:*),Bash(ls:*),Bash(mkdir:*)" \
-            --max-turns 400 \
-            > "data/logs/claude-$(date +%F).log" 2>&1 || status=$?
-          # never keep a credential in the log if an error message quotes one
-          sed -i -E 's/sk-ant-[A-Za-z0-9_-]+/[token removed]/g' "data/logs/claude-$(date +%F).log"
-          tail -n 1 "data/logs/claude-$(date +%F).log" | grep -E '^done:' || echo "Claude finished (summary in the vault log)"
-          exit ${status:-0}
+          LOG="data/logs/claude-$(date +%F).log"
+          PROMPT="$(cat prompts/daily.md)"
+          # If Claude stops before printing its final "done:" line, start it again to carry on (up to 3 passes).
+          for pass in 1 2 3; do
+            echo "=== pass $pass ===" >> "$LOG"
+            status=0
+            claude -p "$PROMPT" \
+              --permission-mode acceptEdits \
+              --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(uv run:*),Bash(python3:*),Bash(curl:*),Bash(ls:*),Bash(mkdir:*)" \
+              --max-turns 400 \
+              >> "$LOG" 2>&1 || status=$?
+            # never keep a credential in the log if an error message quotes one
+            sed -i -E 's/sk-ant-[A-Za-z0-9_-]+/[token removed]/g' "$LOG"
+            if tail -n 3 "$LOG" | grep -qE '^done:'; then echo "Claude finished (pass $pass)"; break; fi
+            echo "Claude stopped early on pass $pass; continuing"
+            PROMPT="Continue the job below from where the last session stopped. Check plan/queue.json and the files to see what is already done.
+
+          $(cat prompts/daily.md)"
+          done
+          exit $status
 
       - name: Render, check and upload
         env:

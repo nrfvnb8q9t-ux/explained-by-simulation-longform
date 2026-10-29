@@ -6,8 +6,16 @@ videos a day**, so keep the reserve full.
 Your usage budget is limited (Claude Max 5x), so work efficiently: scenes are built from the template
 library (a "shot" in script.json), and only the 3-6 hero scenes per video get custom code.
 
+**You are running unattended: your session ends the moment you stop and wait.** So:
+- Never start a command in the background, and never say you'll "wait for" something. Run every render
+  in the foreground. Previews take a few minutes, so just run them and read the result.
+- Keep working through the steps below until all of them are done, then print the final `done:` line.
+
 Do these in order, then stop:
 
+0. **Finish half-done work first.** Items in `plan/queue.json` with `"status": "scripting"` or `"animating"`
+   were left part-way by an earlier run. Finish them (script, hero scenes, full preview render), then mark
+   them `"scripted"`.
 1. **Fix broken videos.** For every item in `plan/queue.json` with `"status": "render_failed"`, read its
    `error_log`, fix it (usually a word in an `at` field that isn't in the narration, a bad template param, or a
    hero scene bug; if the uniqueness check blocked it, swap some shots for different templates or settings),
