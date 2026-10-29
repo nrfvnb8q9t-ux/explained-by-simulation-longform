@@ -49,22 +49,45 @@ def kinetic_text(f, p):
     c_ = accent(f, p)
     words = p("words", [{"text": "NO"}, {"text": "WARNING"}])
     n = len(words)
+    # Flow layout: measure every word, wrap into lines no wider than the screen, and shrink the type until the
+    # whole block fits, so long words never overlap.
+    labels = [w["text"].upper() for w in words]
+    size, gap, max_w = 150, 50, 1640
+    while True:
+        widths = [font(size, "bold").measureText(s) for s in labels]
+        lines, cur, cur_w = [], [], 0
+        for i, wd in enumerate(widths):
+            if cur and cur_w + gap + wd > max_w:
+                lines.append(cur)
+                cur, cur_w = [], 0
+            cur_w += (gap if cur else 0) + wd
+            cur.append(i)
+        lines.append(cur)
+        if (len(lines) <= 3 and max(widths) <= max_w) or size <= 60:
+            break
+        size -= 10
+    line_h = size * 1.25
+    top = 540 - (len(lines) - 1) * line_h / 2
+    pos = {}
+    for li, line in enumerate(lines):
+        total = sum(widths[i] for i in line) + gap * (len(line) - 1)
+        x = 960 - total / 2
+        for i in line:
+            pos[i] = (x + widths[i] / 2, top + li * line_h)
+            x += widths[i] + gap
     for i, w in enumerate(words):
         t0 = f.next_beat(w["at"]) if w.get("at") and f.beats else (f.time(w["at"]) if w.get("at") else 0.3 + i * 0.35)
         s = f.t - t0
         if s < 0:
             continue
-        row, colm = divmod(i, 3 if n > 4 else n)
-        per_row = 3 if n > 4 else n
-        x = 960 + (colm - (per_row - 1) / 2) * 560 if per_row > 1 else 960
-        y = 470 + row * 200 - (0 if n <= 4 else 100)
+        x, y = pos[i]
         k = clamp(s / 0.12)
-        sc = lerp(1.6, 1, ease_out(k))
+        sc = lerp(1.5, 1, ease_out(k))
         f.c.save()
         f.c.translate(x, y)
         f.c.scale(sc, sc)
-        text(f, w["text"].upper(), 0, 50, size=140 if len(w["text"]) < 9 else 100,
-             color=w.get("color", INK if i % 3 else c_), glow_color=c_ if i == n - 1 else None, stroke=10, a=k)
+        text(f, labels[i], 0, size * 0.35, size=size,
+             color=w.get("color", INK if i % 3 else c_), glow_color=c_ if i == n - 1 else None, stroke=size * 0.07, a=k)
         f.c.restore()
 
 

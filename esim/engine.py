@@ -182,6 +182,8 @@ def _norm(w):
 
 @lru_cache(maxsize=512)
 def _rgb(hex_color):
+    if not isinstance(hex_color, str):  # already an (r, g, b) tuple, e.g. from mix()
+        return tuple(float(v) for v in hex_color[:3])
     h = hex_color.lstrip("#")
     return tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
 
@@ -283,6 +285,10 @@ def dots(f, xs, ys, sizes, alphas, color=INK, add=False, buckets=4):
     """Draw many round dots fast by batching them into a few size/alpha groups."""
     if len(xs) == 0:
         return
+    xs = np.atleast_1d(np.asarray(xs, np.float32))  # plain lists and single numbers are fine too
+    ys = np.atleast_1d(np.asarray(ys, np.float32))
+    sizes = np.broadcast_to(np.asarray(sizes, np.float32), xs.shape)
+    alphas = np.broadcast_to(np.asarray(alphas, np.float32), xs.shape)
     sizes = np.asarray(sizes, np.float32)
     alphas = np.clip(np.asarray(alphas, np.float32), 0, 1)
     s_lo, s_hi = float(sizes.min()), float(sizes.max()) + 1e-6
@@ -764,6 +770,9 @@ def slam_text(f, s, x, y, at, size=150, color=INK, glow_color=RED, hold=None, sn
     With snap=True it lands on the first beat at or after `at`, so it hits with the music."""
     start = f.next_beat(at) if snap and f.beats else f.time(at)
     s_t = f.t - start
+    width = font(size, weight).measureText(s)
+    if width > W - 200:  # long punchlines shrink to fit the screen
+        size = size * (W - 200) / width
     if s_t < 0 or (hold is not None and s_t > hold + 0.25):
         return
     k = clamp(s_t / 0.16)

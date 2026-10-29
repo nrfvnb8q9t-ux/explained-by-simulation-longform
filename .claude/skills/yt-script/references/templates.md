@@ -174,7 +174,8 @@ A ranked-list entry: a huge '#3', the item's name, a spinning body and 1-3 quick
     params: rank, name, kind (body to show, or none), facts [text] (0-3), color, background
 
 ### `stat_grid`
-2-6 fact tiles popping in one at a time, each a big number with a label. Great for 'by the numbers' moments.
+2-6 fact tiles popping in one at a time, each a big number with a label. Great for "by the numbers" moments.
+    Keep each value SHORT: a number or 1-3 words ("8 min", "4x", "-73°C"). Long values wrap and lose impact.
     params: title, stats [{value (text), label, at}], color, background
 
 ### `thermometer`

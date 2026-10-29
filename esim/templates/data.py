@@ -162,7 +162,8 @@ def countdown(f, p):
 
 @template("stat_grid", kind="data", sfx=lambda p: [Sfx("pop", s.get("at", 0.5 + i * 0.6)) for i, s in enumerate(p("stats", [])[:6])])
 def stat_grid(f, p):
-    """2-6 fact tiles popping in one at a time, each a big number with a label. Great for 'by the numbers' moments.
+    """2-6 fact tiles popping in one at a time, each a big number with a label. Great for "by the numbers" moments.
+    Keep each value SHORT: a number or 1-3 words ("8 min", "4x", "-73°C"). Long values wrap and lose impact.
     params: title, stats [{value (text), label, at}], color, background"""
     _bg(f, p)
     c_ = accent(f, p)
@@ -172,7 +173,26 @@ def stat_grid(f, p):
     rows = math.ceil(n / cols)
     if p("title"):
         text(f, p("title"), 960, 140, size=64, a=f.prog(0, 0.5))
-    tw, th = 480, 260
+    tw = min(520, (1760 - 50 * (cols - 1)) / cols)
+    th = 260
+    # one value size for every tile, shrunk until the longest value and label fit inside their tile
+    vsize = 84
+    while vsize > 48 and max(font(vsize, "bold").measureText(s.get("value", "")) for s in stats) > tw - 50:
+        vsize -= 4
+
+    def wrap(s, size, width):
+        lines, cur = [], ""
+        for word in s.split():
+            trial = f"{cur} {word}".strip()
+            if cur and font(size, "bold").measureText(trial) > width:
+                lines.append(cur)
+                cur = word
+            else:
+                cur = trial
+        return lines + [cur] if cur else lines
+    lsize = 34
+    while lsize > 20 and max(font(lsize, "semibold").measureText(s.get("label", "")) for s in stats) > tw - 40:
+        lsize -= 2
     for i, s in enumerate(stats):
         r_, c2 = divmod(i, cols)
         x = 960 + (c2 - (cols - 1) / 2) * (tw + 50)
@@ -187,8 +207,12 @@ def stat_grid(f, p):
         rr = skia.RRect.MakeRectXY(skia.Rect.MakeXYWH(-tw / 2, -th / 2, tw, th), 28, 28)
         f.c.drawRRect(rr, paint("#000000", 0.55))
         f.c.drawRRect(rr, paint(c_, 0.6, stroke=3))
-        text(f, s.get("value", ""), 0, 10, size=84, glow_color=c_)
-        text(f, s.get("label", ""), 0, 80, size=34, color=DIM, weight="semibold")
+        vlines = wrap(s.get("value", ""), vsize, tw - 50)[:3]
+        vs = vsize if len(vlines) == 1 else min(vsize, 52)
+        vlines = wrap(s.get("value", ""), vs, tw - 50)[:3]
+        for li, line in enumerate(vlines):
+            text(f, line, 0, 10 - (len(vlines) - 1) * vs * 0.55 + li * vs * 1.1, size=vs, glow_color=c_)
+        text(f, s.get("label", ""), 0, 80 + (len(vlines) - 1) * vs * 0.3, size=lsize, color=DIM, weight="semibold")
         f.c.restore()
 
 
