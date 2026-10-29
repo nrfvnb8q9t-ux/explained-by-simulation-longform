@@ -150,10 +150,11 @@ def add(folder, credit=None):
     MUSIC_DIR.mkdir(parents=True, exist_ok=True)
     # optional tracks.json next to the files: [{"title", "artist", "mood"}], e.g. from the Audio Library
     sidecar = folder / "tracks.json"
-    moods = {}
+    moods, credits = {}, {}
     if sidecar.exists():
         for t in json.loads(sidecar.read_text()):
-            moods[f"{t['title']} - {t.get('artist', '')}".lower()] = t.get("mood")
+            key = re.sub(r"[^a-z0-9]", "", f"{t['title']} - {t.get('artist', '')}".lower())
+            moods[key], credits[key] = t.get("mood"), t.get("credit")
     added = 0
     for p in files:
         name = p.name
@@ -165,10 +166,10 @@ def add(folder, credit=None):
             print(f"  skipped {name}: {e}")
             continue
         shutil.copy2(p, MUSIC_DIR / name) if (MUSIC_DIR / name) != p else None
-        mood = next((m for key, m in moods.items()
-                     if re.sub(r"[^a-z0-9]", "", key) == re.sub(r"[^a-z0-9]", "", p.stem.lower())), None)
-        lib["tracks"].append({"file": name, "title": p.stem, **info, "mood": mood,
-                              "credit": credit.format(title=p.stem) if credit else None})
+        key = re.sub(r"[^a-z0-9]", "", p.stem.lower())
+        mood = moods.get(key)
+        line = credits.get(key) or (credit.format(title=p.stem) if credit else None)
+        lib["tracks"].append({"file": name, "title": p.stem, **info, "mood": mood, "credit": line})
         added += 1
         print(f"  + {p.stem}: {info['bpm']:.0f} bpm, {info['duration'] / 60:.1f} min, {len(info['drops'])} drop(s)")
     save_library(lib)
@@ -236,6 +237,8 @@ def plan_soundtrack(timeline, total, rng, max_section=150.0):
                 s = abs(t.get("energy", 0.5) - target) * 2 + usage.get(t["file"], 0) * 0.6
                 s += 3 if t["file"] in used_this_video else 0
                 s += 0.4 if sec["level"] == "hype" and not t["drops"] else 0
+                # NCS is the best-known no-copyright music, so it leads the hype and mid sections
+                s -= 0.35 if sec["level"] != "calm" and "NoCopyrightSounds" in (t.get("credit") or "") else 0
                 return s + rng.random() * 0.3
             track = min(lib, key=score)
             used_this_video.append(track["file"])

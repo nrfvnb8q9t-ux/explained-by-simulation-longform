@@ -108,7 +108,7 @@ def split_compare(f, p):
             f.c.drawPaint(paint("#0a1020", 0.6))
         body(f, spec.get("kind", "earth"), x if k > 0.5 or side == 1 else 960, 520, 280,
              light=(-0.6, -0.3, 0.7), seed_key="split")
-        text(f, spec.get("label", "").upper(), x, 920, size=64, glow_color=c_ if side else None, a=1 if side == 0 else k)
+        text(f, spec.get("label", "").upper(), x, 860, size=64, glow_color=c_ if side else None, a=1 if side == 0 else k)
         f.c.restore()
     if k > 0:
         f.c.drawLine(div, 0, div, H, paint(c_, 0.9, stroke=6))
@@ -251,7 +251,7 @@ def question_card(f, p):
     f.c.scale(pulse * ease_back(f.prog(0.6, 0.6)), pulse * ease_back(f.prog(0.6, 0.6)))
     text(f, "?", 0, 160, size=460, color=c_, glow_color=c_, a=0.9)
     f.c.restore()
-    text(f, q, 960, 880, size=72 if len(q) < 28 else 56, reveal=f.prog(1.0, 1.0, ease=lambda v: clamp(v)), stroke=6)
+    text(f, q, 960, 850, size=72 if len(q) < 28 else 56, reveal=f.prog(1.0, 1.0, ease=lambda v: clamp(v)), stroke=6)
 
 
 @template("radar_scan", kind="cinematic", sfx=lambda p: [Sfx("tick", 0.6 + i * 0.9) for i in range(4)])
@@ -279,3 +279,43 @@ def radar_scan(f, p):
         glow(f, x, y, 10, c_, 0.6 + 0.4 * math.sin(f.t * 5 + i))
         text(f, tg.get("label", "").upper(), x + 24, y - 18, size=30, color=c_, align="left", weight="semibold",
              reveal=f.prog(t0, 0.4, ease=lambda v: clamp(v)))
+
+
+@template("reveal", kind="cinematic", sfx=lambda p: [Sfx("rumble", "start", dur=4, gain_db=-6),
+                                                      Sfx("reverse", p("at", "end"), offset=-1.2, dur=1.2),
+                                                      Sfx("impact", p("at", "end")), Sfx("808", p("at", "end"))])
+def reveal(f, p):
+    """The shock drop. Darkness and a heartbeat glow while the narration builds, then on the key word a blinding
+    hit and the reveal slams in: a body or a huge number, with a shockwave, debris and a punchline.
+    Use it for the 2-4 most jaw-dropping facts in a video, with the scene's "drop" on the same word.
+    params: at (the reveal word, required), kind (body to reveal, e.g. black_hole, red_giant, earth),
+    number (text instead of a body, e.g. "1,300,000x"), title (punchline, 1-4 words), sub (one line), color, size"""
+    c_ = accent(f, p, default=["red", "gold", "cyan", "pink"])
+    hit = when(f, p("at"), 0.55)
+    s = f.since(hit)
+    gradient_bg(f, "#02030a", "#000000")
+    if s < 0:  # the build: almost black, a slow heartbeat of light, stars barely there
+        k = clamp(f.t / max(hit, 0.1))
+        starfield(f, n=160, drift=(0, 0), alpha=0.25 + 0.3 * k)
+        beat = abs(math.sin(f.t * (2.2 + 4 * k)))
+        soft_light(f, 960, 540, 200 + 300 * k, c_, (0.08 + 0.25 * k) * beat)
+        ring(f, 960, 540, 120 + 30 * beat, 3, c_, 0.25 * k * beat)
+        return
+    shake = 26 * math.exp(-s * 3.2)
+    zoom = 1 + 0.25 * math.exp(-s * 2.5)
+    with camera(f, 960, 540, zoom=zoom, shake=shake):
+        starfield(f, n=420, drift=(-40 * math.exp(-s), 0), alpha=0.9)
+        nebula_glow(f, alpha=0.35 * clamp(s))
+        r = p("size", 230)
+        if p("number"):
+            text(f, p("number"), 960, 590, size=220 if len(p("number")) < 9 else 150, glow_color=c_, stroke=14)
+        else:
+            body(f, p("kind", "black_hole"), 960, 520, r * ease_back(clamp(s / 0.45)), light=(-0.6, -0.3, 0.7))
+        shockwave(f, 960, 540, hit, speed=1400, life=1.6, color=c_, width=30)
+        shockwave(f, 960, 540, hit + 0.18, speed=900, life=1.8, color=INK, width=12)
+        particles(f, 960, 540, hit, n=320, speed=(300, 1500), life=(0.6, 2.5), size=(2, 6), color=c_)
+    if p("title"):
+        slam_text(f, p("title"), 960, 840 if p("number") else 880, hit + 0.15, size=150, glow_color=c_, snap=False)
+    if p("sub"):
+        text(f, p("sub"), 960, 950, size=40, color=DIM, weight="semibold", a=f.prog(hit + 0.9, 0.5))
+    flash(f, hit, dur=0.55, color="#ffffff", peak=1.0)

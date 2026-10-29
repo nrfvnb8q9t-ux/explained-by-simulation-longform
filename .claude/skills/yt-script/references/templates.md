@@ -1,4 +1,4 @@
-# Scene templates (48)
+# Scene templates (49)
 
 
 ## Space templates
@@ -204,6 +204,13 @@ A big mystery question with a pulsing question mark, for opening a 'real mystery
 ### `radar_scan`
 A radar sweep picking up objects one by one (asteroids, signals, planets), each tagged as it's found.
     params: targets [{label, at}] (1-5), color
+
+### `reveal`
+The shock drop. Darkness and a heartbeat glow while the narration builds, then on the key word a blinding
+    hit and the reveal slams in: a body or a huge number, with a shockwave, debris and a punchline.
+    Use it for the 2-4 most jaw-dropping facts in a video, with the scene's "drop" on the same word.
+    params: at (the reveal word, required), kind (body to reveal, e.g. black_hole, red_giant, earth),
+    number (text instead of a body, e.g. "1,300,000x"), title (punchline, 1-4 words), sub (one line), color, size
 
 ### `split_compare`
 Before and after, side by side: the screen splits with a sliding divider (e.g. Earth now vs Earth frozen).

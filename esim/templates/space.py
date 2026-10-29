@@ -161,7 +161,7 @@ def size_scale(f, p):
 
     def rad(b):
         v = b.get("radius_km", 1)
-        return 40 + 360 * (math.log(v) / math.log(biggest) if use_log else v / biggest)
+        return 40 + 310 * (math.log(v) / math.log(biggest) if use_log else v / biggest)
 
     xs, x = [], 200
     for b in items:
@@ -172,14 +172,14 @@ def size_scale(f, p):
     span = max(x - 200, W)
     pan = lerp(0, span - W + 200, ease_in_out(f.p)) if span > W else 0
     zoom = lerp(1.25, 0.95, ease_in_out(f.p)) if span <= W else 1.0
-    with camera(f, W / 2 + pan, 560, zoom=zoom):
+    with camera(f, W / 2 + pan, 500, zoom=zoom):
         for i, (b, cx) in enumerate(zip(items, xs)):
             r = rad(b)
             a = f.prog(0.4 + i * 0.6, 0.6)
-            body(f, b.get("kind", "rocky"), cx, 560, r * lerp(0.6, 1, ease_back(a)), light=(-0.6, -0.3, 0.7), alpha=a)
-            text(f, b.get("label", ""), cx, 560 + r + 70, size=44, a=a)
+            body(f, b.get("kind", "rocky"), cx, 500, r * lerp(0.6, 1, ease_back(a)), light=(-0.6, -0.3, 0.7), alpha=a)
+            text(f, b.get("label", ""), cx, 500 + r + 70, size=44, a=a)
             if b.get("radius_km"):
-                text(f, f"{b['radius_km']:,} km radius", cx, 560 + r + 118, size=28, color=DIM, weight="body", a=a)
+                text(f, f"{b['radius_km']:,} km radius", cx, 500 + r + 118, size=28, color=DIM, weight="body", a=a)
     if use_log:
         text(f, "sizes on a log scale", 40, H - 36, size=24, color=DIM, align="left", weight="body", a=0.7)
 
@@ -579,7 +579,7 @@ def star_lifecycle(f, p):
         body(f, a["kind"] if k < 0.5 else b["kind"], 960, 520, size)
         if k > 0.3 and k < 0.7:
             flash(f, times[nxt] + 0.6, dur=0.5, peak=0.4)
-    text(f, (a if k < 0.5 else b).get("name", ""), 960, 960, size=60, glow_color=accent(f, p))
+    text(f, (a if k < 0.5 else b).get("name", ""), 960, 120, size=60, glow_color=accent(f, p))
 
 
 # ---------------------------------------------------------------- 18. comet
@@ -697,4 +697,4 @@ def zoom_scale(f, p):
             dots(f, 960 + np.cos(ang) * dd * sc, 540 + np.sin(ang) * dd * sc * 0.6, 0.6 + dd * 1.2,
                  g * (0.3 + 0.6 * (1.1 - dd)), accent(f, p, default=["cyan", "purple", "gold"]), add=True)
     idx = min(int(level + 0.5), len(stages) - 1)
-    text(f, stages[idx]["name"], 960, 980, size=62, glow_color=accent(f, p))
+    text(f, stages[idx]["name"], 960, 120, size=62, glow_color=accent(f, p))

@@ -163,7 +163,7 @@ def overlays(f, shot):
     """The extras any shot can have: fact cards, a slam-text punchline, a note."""
     for card in shot.get("cards", []):
         caption_card(f, card["title"], card.get("sub", ""), card["at"], hold=card.get("hold"),
-                     x=W * card.get("x", 0.5), y=H * card.get("y", 0.86),
+                     x=W * card.get("x", 0.5), y=H * card.get("y", 0.74),
                      color=ACCENTS.get(card.get("color", "cyan"), card.get("color", CYAN)))
     slam = shot.get("slam")
     if slam:
@@ -182,7 +182,6 @@ def run_shot(f, shot):
     overlays(f, shot)
     if tpl["kind"] != "board":
         vignette(f, 0.5)
-    fade(f, fade_in=0.25, fade_out=0.25)
 
 
 def shot_sfx(shot):

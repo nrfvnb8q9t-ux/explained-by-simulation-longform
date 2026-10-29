@@ -40,6 +40,9 @@ so hero scenes are clearly a step above them rather than a copy of one.
    so the contrast makes the next drop hit harder. The renderer adds beat zoom punches and drop flashes
    automatically from each scene's intensity, so don't recreate those by hand.
 
+8. **Keep the bottom 150px clear.** Burned-in captions are drawn there on every scene. A transition is also added
+   automatically at the start of each scene, so don't fade your scene in or out yourself.
+
 ## Steps
 
 1. Read `channel.md`, `videos/<slug>/script.json` and `references/engine.md` (in this skill's folder).

@@ -31,6 +31,7 @@ import skia
 import soundfile as sf
 
 from esim import audio, engine, music, unique, voice
+from esim import edit as edit_fx
 
 ROOT = Path(__file__).resolve().parent.parent
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
@@ -78,9 +79,10 @@ def edit_level(edit, intensity):
 
 
 def draw_frame(fn, canvas, t, dur, index, seed, scene_id, words, scale, fps,
-               beats=(), drops=(), intensity=0.4, edit="calm"):
-    """Draw one frame, then the automatic edit layer: zoom punches on the beat, and on a music drop a
-    flash, a camera shake and a zoom slam. Returns how much RGB split to apply (0..1)."""
+               beats=(), drops=(), intensity=0.4, edit="calm", transition=None, captions=None):
+    """Draw one frame, then the automatic edit layer: the scene's transition, zoom punches on the beat, a
+    flash, shake and zoom slam on a music drop, and the burned-in captions.
+    Returns (rgb split amount, glitch slice amount) for the pixel effects applied afterwards."""
     f = engine.Frame(c=canvas, t=t, dur=dur, index=index, seed=seed, scene_id=scene_id, words=words, fps=fps,
                      beats=list(beats), drops=list(drops), intensity=intensity)
     punch, min_strength, bar_flash = EDIT_LEVELS[edit_level(edit, intensity)]
@@ -95,19 +97,36 @@ def draw_frame(fn, canvas, t, dur, index, seed, scene_id, words, scale, fps,
         sx, sy = shake * math.sin(since * 61), shake * math.cos(since * 47)
         flash = max(flash, 0.7 * math.exp(-since * 8))
         split = k
+    tr = edit_fx.transition_state(transition, t, dur, edit_level(edit, intensity)) if transition else None
+    if tr:
+        zoom *= tr["zoom"]
+        sx += tr["dx"]
+        sy += tr["dy"]
+        split = max(split, tr["split"])
     canvas.save()
     canvas.clear(skia.ColorBLACK)
     if scale != 1:
         canvas.scale(scale, scale)
-    if zoom != 1 or sx:
+    rot = tr["rotate"] if tr else 0.0
+    if zoom != 1 or sx or sy or rot:
         canvas.translate(engine.W / 2 + sx, engine.H / 2 + sy)
         canvas.scale(zoom, zoom)
+        if rot:
+            canvas.rotate(rot)
         canvas.translate(-engine.W / 2, -engine.H / 2)
     fn(f)
     canvas.restore()
+    canvas.save()
+    if scale != 1:
+        canvas.scale(scale, scale)
+    if captions:
+        edit_fx.draw_captions(canvas, t, captions)
+    if tr:
+        edit_fx.draw_transition_overlays(canvas, tr, t, seed)
+    canvas.restore()
     if flash > 0.005:
         canvas.drawPaint(skia.Paint(Color=skia.Color4f(1, 1, 1, min(flash, 1)).toColor()))
-    return split
+    return split, (tr["slices"] if tr else 0.0)
 
 
 def rgb_split(arr, amount, scale):
@@ -119,9 +138,11 @@ def rgb_split(arr, amount, scale):
 
 def render_scene(job):
     """Worker: render one scene to its own mp4 segment. Runs in a separate process."""
-    video_dir, scene_id, dur, words, seed, out_path, scale, fps, preset, beats, drops, intensity = job
+    (video_dir, scene_id, dur, words, seed, out_path, scale, fps, preset, beats, drops, intensity,
+     transition, show_captions) = job
     scenes = load_scenes(video_dir)
     fn, edit = scenes[scene_id]["fn"], scenes[scene_id]["edit"]
+    chunks = edit_fx.caption_chunks(words) if show_captions else None
     w, h = int(engine.W * scale), int(engine.H * scale)
     arr, surf = _surface(w, h)
     canvas = surf.getCanvas()
@@ -133,10 +154,12 @@ def render_scene(job):
     try:
         for i in range(n_frames):
             try:
-                split = draw_frame(fn, canvas, i / fps, dur, i, seed, scene_id, words, scale, fps,
-                                   beats, drops, intensity, edit)
+                split, slices = draw_frame(fn, canvas, i / fps, dur, i, seed, scene_id, words, scale, fps,
+                                           beats, drops, intensity, edit, transition, chunks)
             except Exception:
                 raise RuntimeError(f"Scene {scene_id} crashed at t={i / fps:.2f}s:\n{traceback.format_exc()}")
+            if slices > 0.05:
+                edit_fx.glitch_slices(arr, slices, seed, i, scale)
             if split > 0.05:
                 rgb_split(arr, split, scale)
             proc.stdin.write(arr.tobytes())
@@ -243,7 +266,10 @@ def main():
             drop_at = probe.word(s["drop"])
         timeline.append({"id": s["id"], "start": cursor, "dur": dur, "lead": lead, "clip": clip,
                          "words": scene_words, "mood": s.get("mood", "wonder"),
-                         "intensity": s.get("intensity", 0.4), "chapter": s.get("chapter"), "drop_at": drop_at})
+                         "intensity": s.get("intensity", 0.4), "chapter": s.get("chapter"), "drop_at": drop_at,
+                         "transition": edit_fx.pick_transition(seed, s["id"], edit_level(reg["edit"], s.get("intensity", 0.4)),
+                                                               s.get("transition"), first=not timeline),
+                         "captions": s.get("captions", (s.get("shot") or {}).get("template") != "kinetic_text")})
         cursor += dur
     total = cursor
     print(f"      total length {fmt_time(total)}", flush=True)
@@ -263,7 +289,7 @@ def main():
     # 2. frames, scenes in parallel
     only = {int(x) if x.isdigit() else x for x in args.scenes.split(",")} if args.scenes else None
     jobs = [(str(video_dir), it["id"], it["dur"], it["words"], seed, str(seg_dir / f"{i:03d}.mp4"), scale, fps, preset,
-             *local(it), it["intensity"])
+             *local(it), it["intensity"], it["transition"], it["captions"])
             for i, it in enumerate(timeline) if not only or it["id"] in only]
     print(f"[2/5] Rendering {len(jobs)} scenes on {args.workers} cores...", flush=True)
     with ProcessPoolExecutor(max_workers=args.workers, mp_context=get_context("spawn")) as pool:
@@ -287,6 +313,13 @@ def main():
             clip = audio.make_sfx(sfx.kind, rng, sfx.dur)
             gain = audio.SFX_GAIN_DB.get(sfx.kind, -16) + sfx.gain_db
             events.append((it["start"] + f.time(sfx.at) + sfx.offset, clip, gain))
+        tsfx = edit_fx.TRANSITION_SFX.get(it["transition"])
+        if tsfx and it is not timeline[0]:  # every transition gets its own whoosh/glitch, made fresh
+            rng = np.random.default_rng(engine.stable_seed(seed, it["id"], "transition-sfx"))
+            kind, gain = tsfx
+            lead_in = 0.25 if kind in ("whoosh", "reverse") else 0.0
+            events.append((it["start"] - lead_in, audio.make_sfx(kind, rng, 0.6 if kind == "reverse" else None),
+                           audio.SFX_GAIN_DB.get(kind, -16) + gain))
     if placements:
         bed = music.build_bed(placements, total, audio.SR)
         master = audio.mix(total, voice_clips, events, bed, np.random.default_rng(seed), music_db=-20, duck_depth=0.62)

@@ -810,7 +810,7 @@ def label(f, s, x, y, tx, ty, at, size=36, color=INK, line_color=DIM):
          align="left" if tx >= x else "right", weight="semibold", reveal=clamp((pr - 0.5) * 2))
 
 
-def caption_card(f, title, sub, at, x=W / 2, y=H - 150, hold=None, color=CYAN):
+def caption_card(f, title, sub, at, x=W / 2, y=H - 260, hold=None, color=CYAN):
     """A lower-third fact card: a big number or phrase, with a small explanation under it."""
     s = f.since(at)
     if s < 0 or (hold is not None and s > hold + 0.5):

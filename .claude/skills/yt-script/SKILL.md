@@ -37,8 +37,14 @@ Each scene is one visual idea the animator can build. End a scene where the pict
   The music and the edit follow them (see "Edit style" in `channel.md`):
   - 0.6+ is a **hype** scene: high-energy music, with beat punches, flashes and slam text.
   - Under 0.35 is a **breather**: whiteboard explanations, charts, calmer music.
-  - The hook (scene 1) is always hype. Plan a hype moment every 2-3 minutes, with breathers in between.
-    Several hype scenes in a row merge into one music section, so the drop only hits on the first.
+  - The hook (scene 1) is always hype, and it ends on a shocking fact or image within 20 seconds.
+  - **A shock drop every 60-90 seconds.** That's a jaw-dropping fact revealed on one word ("...and it would be
+    **one million** times brighter than the Sun"). Build up to it for 1-2 sentences first ("Here's where it gets
+    insane.", "Now look at the number."), put the `drop` on the reveal word, and use the `reveal` template or a
+    custom hero scene. Aim for 8-12 drops in a 12-15 minute video.
+  - Between drops, breathers explain the science so the next drop lands. Several hype scenes in a row merge
+    into one music section, so put a breather between drops whenever you can.
+  - Escalate: each drop bigger than the last, with the biggest kept for the climax near the end.
 - On a hype scene's biggest word, add `"drop": "<word>"`. The music's drop lands exactly on that word
   (e.g. `"drop": "gone"` for "Just... gone."). The word must appear in that scene's narration.
 - Don't add pause markers or extra punctuation for timing. The narrator's natural pacing is used as-is.
@@ -71,9 +77,14 @@ you write the shots.
   simulations, whiteboard scenes (`board_*`), data scenes and cinematic scenes. Open each chapter with a
   `title_card`, `warp`, `kinetic_text` or `question_card`. Check `content-log.md` and lean towards templates the
   last few videos didn't use much.
-- **Hero scenes:** mark the **3-6 biggest moments** (the hook, the main drops and the climax) with `"custom": true`
-  and no shot. `yt-animate` writes bespoke animation code for exactly those. Keep it to 6 at most, because custom code
-  uses far more of the daily Claude budget than templates do.
+- **Hero scenes:** mark the **5-7 biggest moments** (the hook, the biggest drops and the climax) with `"custom": true`
+  and no shot. `yt-animate` writes bespoke animation code for exactly those. Keep it to 7 at most, because custom code
+  uses far more of the daily Claude budget than templates do. Other drops use the `reveal` template.
+- **Transitions:** every scene gets an automatic transition (glitch, zoom punch, flash, whip, spin, shutter, iris or
+  light leak), picked from its energy. To choose one, add `"transition": "<name>"` to the scene. Give chapter openings
+  and drops the big ones (`flash`, `glitch`, `shutter`).
+- **Captions are burned in automatically** along the bottom of every scene (except `kinetic_text`). Add
+  `"captions": false` only to a scene whose own on-screen text would clash.
 
 **Packaging:**
 - 5 title options (under 70 characters, strongest first). Use different formulas, front-load the most

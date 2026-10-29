@@ -45,6 +45,10 @@ scientists, so everything has to make sense by ear, without equations on screen.
 - **Breathers** (intensity under 0.35): whiteboard explanations and charts, with calmer music sitting back.
   They make the next drop hit harder, so don't skip them.
 - Everything in between (0.35-0.6) gets a light punch on each bar line.
+- **Shock drops every 60-90 seconds:** build up for a sentence or two, then the reveal hits on one word with the
+  music drop, a blinding flash and a slam-text punchline. Each drop is bigger than the last.
+- **Every scene change is a visible transition** (glitch, zoom punch, whip, spin, shutter, flash), each with its own sound.
+- **Burned-in captions** on every video: big bold words at the bottom, with the word being spoken highlighted.
 
 ## Video lengths
 - Long-form: **12-15 minutes** by default (about 1,800-2,250 words of narration at 150 wpm). If a topic
@@ -68,7 +72,7 @@ close, the air vanishing, the Sun disappearing, Earth stopping spinning, Earth c
 new for that video's script. Reusing code tools is fine (a function that draws a planet); reusing their
 output (a rendered clip, a sound file) is not.
 
-- **Animations:** most scenes use one of 48 randomised templates (space simulations, whiteboard diagrams,
+- **Animations:** most scenes use one of 49 randomised templates (space simulations, whiteboard diagrams,
   data reveals, cinematic titles), filled in with that scene's facts. The 3-6 hero moments per video get bespoke
   animation code. A template never looks the same twice: layout, colours, camera and effects are seeded per video
 - **Whiteboard scenes:** diagrams drawn stroke by stroke on screen, with labels and arrows written in as the narrator explains
@@ -93,4 +97,4 @@ output (a rendered clip, a sound file) is not.
 - Present speculation as settled science. Use "physicists estimate..." or "one model suggests..."
 - Cover pseudoscience, flat earth, astrology or doomsday claims presented as real predictions
 - Copy another creator's script, title, thumbnail or footage
-- Use music that isn't from the YouTube Audio Library, or film or TV clips the channel doesn't own
+- Use music that isn't from the YouTube Audio Library or NCS (always with its credit line in the description), or film or TV clips the channel doesn't own
