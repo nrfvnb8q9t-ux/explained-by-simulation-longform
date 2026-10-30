@@ -4,6 +4,7 @@ GitHub runs this at 18:00 and 19:00 UTC; it only sends at 7pm UK time (so it's r
 
     uv run --no-project --with cryptography python -m esim.evening          # what GitHub runs
     uv run --no-project --with cryptography python -m esim.evening --now    # send immediately (testing)
+    ... python -m esim.evening --now --date 2026-10-29                    # for another day's uploads
 """
 
 import json
@@ -23,7 +24,7 @@ def main():
         return
     raw = vault.read_member("plan/queue.json")
     queue = json.loads(raw) if raw else []
-    today = now.date().isoformat()
+    today = sys.argv[sys.argv.index("--date") + 1] if "--date" in sys.argv else now.date().isoformat()
     done = [i for i in queue if i.get("status") == "uploaded" and i.get("uploaded") == today and i.get("video_id")]
     ready = sum(1 for i in queue if i.get("status") == "scripted")
     if not done:
