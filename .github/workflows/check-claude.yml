@@ -1,0 +1,24 @@
+name: check-claude-token
+# Run by hand after changing the CLAUDE_CODE_OAUTH_TOKEN secret: asks Claude for one word, so a bad
+# token shows up now instead of at 05:00.
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install -g @anthropic-ai/claude-code > /dev/null
+      - name: Ask Claude for one word
+        env:
+          CLAUDE_TOKEN_RAW: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          export CLAUDE_CODE_OAUTH_TOKEN="$(printf '%s' "$CLAUDE_TOKEN_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$CLAUDE_CODE_OAUTH_TOKEN"
+          out=$(claude -p "Reply with exactly the word: ok" 2>&1 | sed 's/sk-ant-[A-Za-z0-9_-]*/[token]/g')
+          echo "$out"
+          echo "$out" | grep -qi "ok" || { echo "The Claude token didn't work."; exit 1; }
