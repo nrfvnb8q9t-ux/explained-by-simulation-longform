@@ -178,7 +178,17 @@ def run_shot(f, shot):
     tpl = TEMPLATES.get(shot["template"])
     if not tpl:
         raise ValueError(f"Unknown template '{shot['template']}'. Run `uv run python -m esim.templates` for the list.")
-    tpl["fn"](f, P(shot.get("params", {})))
+    # A slow, seeded camera drift under every template, so no shot is ever a frozen frame. It zooms in a little
+    # first so the edges never show, and templates' own camera moves stack on top of it. Templates should keep
+    # important content inside x 90-1830 and y 60-880.
+    rng = f.rng("ambient_cam")
+    dx, dy, zdir = rng.uniform(-1, 1), rng.uniform(-1, 1), 1 if rng.random() < 0.7 else -1
+    k = ease_in_out(f.p)
+    # Kept gentle (at most 1.08x) so content near the edges and above the caption strip stays on screen.
+    zoom = 1.03 + 0.05 * (k if zdir > 0 else 1 - k) + 0.004 * math.sin(f.t * 0.9)
+    with camera(f, W / 2 + dx * 40 * (k - 0.5), H / 2 + dy * 18 * (k - 0.5), zoom=zoom,
+                rotate=0.35 * math.sin(f.t * 0.23 + dx * 3)):
+        tpl["fn"](f, P(shot.get("params", {})))
     overlays(f, shot)
     if tpl["kind"] != "board":
         vignette(f, 0.5)
@@ -213,6 +223,6 @@ def reference():
 # engine's space() drawing function (star-imported above) instead of the space.py module.
 import importlib  # noqa: E402
 
-for _mod in ("space", "board", "data", "cinematic"):
+for _mod in ("space", "board", "data", "cinematic", "worlds", "physics", "story", "hud"):
     importlib.import_module(f"esim.templates.{_mod}")
 space = E.space  # keep the drawing function under its usual name

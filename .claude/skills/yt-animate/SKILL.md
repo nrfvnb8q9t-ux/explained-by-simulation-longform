@@ -40,7 +40,11 @@ so hero scenes are clearly a step above them rather than a copy of one.
    so the contrast makes the next drop hit harder. The renderer adds beat zoom punches and drop flashes
    automatically from each scene's intensity, so don't recreate those by hand.
 
-8. **Keep the bottom 150px clear.** Burned-in captions are drawn there on every scene. A transition is also added
+8. **Never open on an empty screen.** The main subject and a full, layered composition are visible from the
+   first frame. Word triggers add to it and escalate it (a new layer, a state change, a slam), and never
+   reveal it from a blank starfield. `esim.qa` fails any scene that's nearly empty for more than a second.
+
+9. **Keep the bottom 150px clear.** Burned-in captions are drawn there on every scene. A transition is also added
    automatically at the start of each scene, so don't fade your scene in or out yourself.
 
 ## Steps
@@ -61,7 +65,19 @@ so hero scenes are clearly a step above them rather than a copy of one.
    <ffmpeg> -loglevel error -y -i build/<slug>/segments/000.mp4 -vf "fps=1,scale=640:-1,tile=4x2" -frames:v 1 build/<slug>/check.png
    ```
    Read the image. Check that text is readable, nothing important is off-screen, and nothing is too dark.
-5. When every scene renders, set the item's status in `plan/queue.json` to `"scripted"`.
+5. **Quality gate (required).** Preview-render EVERY scene (templates too), then run the QA check:
+   ```bash
+   uv run python -m esim.render videos/<slug> --preview --scenes <all scene ids, comma-separated>
+   uv run python -m esim.qa videos/<slug>
+   ```
+   It lists every scene with a nearly empty screen for more than 1 second, or with nothing moving for more
+   than 6 seconds. Fix each one:
+   - **Custom scene:** put the main subject and a full composition on screen from the first frame; triggers
+     escalate what's already there.
+   - **Template scene:** change its params or pick a richer template.
+   Re-render those scenes and run the check again until it prints "All scenes pass". Then grab a contact sheet
+   of the hero scenes (step 4) and look at it yourself: the hero scenes must be the best-looking ones in the video.
+6. When every scene renders and the QA check passes, set the item's status in `plan/queue.json` to `"scripted"`.
 
 ## When fixing a failed render
 

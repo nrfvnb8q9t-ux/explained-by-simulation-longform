@@ -54,7 +54,7 @@ Each scene is one visual idea the animator can build. End a scene where the pict
 
 ## Shots: how each scene looks
 
-Every scene gets a `"shot"` that picks one of the 48 templates in `references/templates.md` and fills it in
+Every scene gets a `"shot"` that picks one of the 73 templates in `references/templates.md` and fills it in
 with this scene's facts, numbers and labels. The renderer draws it, with no code needed. Read that file before
 you write the shots.
 
@@ -77,9 +77,24 @@ you write the shots.
   simulations, whiteboard scenes (`board_*`), data scenes and cinematic scenes. Open each chapter with a
   `title_card`, `warp`, `kinetic_text` or `question_card`. Check `content-log.md` and lean towards templates the
   last few videos didn't use much.
-- **Hero scenes:** mark the **5-7 biggest moments** (the hook, the biggest drops and the climax) with `"custom": true`
-  and no shot. `yt-animate` writes bespoke animation code for exactly those. Keep it to 7 at most, because custom code
-  uses far more of the daily Claude budget than templates do. Other drops use the `reveal` template.
+- **Set pieces carry the video.** These detailed storyboard templates play 3-4 beats in one scene, each beat
+  on its own word param:
+  - Space phenomena: `planet_formation`, `roche_breakup`, `magnetosphere`, `solar_flare`, `accretion_disk`,
+    `tidal_lock`.
+  - Physics simulations: everything in `physics` (Newton's cannon, warped spacetime, free fall, tides, time
+    dilation, Doppler).
+  - Storyboard sequences: `chain_reaction`, `timeline_journey`, `case_file`, `mission_control`, `scale_dive`,
+    `versus_showdown`.
+  - Data and HUD: `leaderboard`, `speed_race`, `pictogram`, `spectrum`, `timeline_log`, `dashboard`.
+
+  Use **at least 8 set pieces per video**, with every beat param tied to a narration word, so the visuals change
+  exactly when the voice says it. Prefer a set piece over a simple data card (`big_number`, `gauge`,
+  `percent_ring`, `thermometer`) whenever a scene runs longer than about 8 seconds. The simple cards are for quick
+  numbers in short scenes.
+- **Hero scenes:** mark the **3-5 biggest moments** (the hook, the two biggest drops and the climax) with
+  `"custom": true` and no shot, but only where no set piece already shows that moment. `yt-animate` writes
+  bespoke animation code for exactly those, and they have to look better than the set pieces. Custom code
+  uses far more of the daily Claude budget than templates do. Other drops use a set piece or the `reveal` template.
 - **Transitions:** every scene gets an automatic transition (glitch, zoom punch, flash, whip, spin, shutter, iris or
   light leak), picked from its energy. To choose one, add `"transition": "<name>"` to the scene. Give chapter openings
   and drops the big ones (`flash`, `glitch`, `shutter`).
@@ -151,6 +166,6 @@ Fix anything that fails:
 - [ ] No sentence that could be cut without losing anything
 - [ ] Total word count is within 10% of the target
 - [ ] Nothing is copied from the outlier video beyond its general pattern
-- [ ] Every scene has a shot or `"custom": true`, with 3-6 custom at most
+- [ ] Every scene has a shot or `"custom": true`, with 3-5 custom at most, and 8+ set pieces with word-timed beats
 - [ ] No template used more than 3 times, none twice in a row
 - [ ] Suitable for all ages

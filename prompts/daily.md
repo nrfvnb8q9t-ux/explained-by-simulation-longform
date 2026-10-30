@@ -26,8 +26,9 @@ Do these in order, then stop:
    - Then use yt-plan to add 30 more days (two videos per day).
 3. **Keep a reserve of finished videos.** Count the items that are `"scripted"`. If there are fewer than
    10, take the earliest `"planned"` items one at a time: script with yt-script (every scene gets a template
-   shot, 3-6 marked `"custom": true`), animate the custom ones with yt-animate, and preview-render the whole
-   video. Write **at most 3 new videos this run**.
+   shot, 8+ of them set pieces, 3-5 marked `"custom": true`), animate the custom ones with yt-animate, preview-render the whole
+   video, and pass the quality gate (`uv run python -m esim.qa videos/<slug>` must print "All scenes pass").
+   Never mark a video `"scripted"` while the QA check lists problems. Write **at most 3 new videos this run**.
 4. Finish with one short line, such as `done: fixed 0, planned 0, scripted 3`.
 
 Rules:

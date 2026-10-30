@@ -84,6 +84,14 @@ def board_diagram(f, p):
         shape = nd.get("shape", "circle")
         pr = f.prog(t0, 0.8)
         pp = pen(f, b, c_, 6, i)
+        if pr <= 0:  # dashed ghost of what's coming, so the board is never blank
+            gp = paint(b["dim"], 0.75, stroke=6)
+            gp.setPathEffect(skia.DashPathEffect.Make([14, 12], f.t * 20))
+            if shape == "box":
+                f.c.drawRect(skia.Rect.MakeXYWH(x - 130, y - 80, 260, 160), gp)
+            else:
+                f.c.drawCircle(x, y, 110 if shape in ("star", "circle") else 85, gp)
+            text(f, "?", x, y + 30, size=96, color=b["dim"], a=0.8, weight="hand")
         if shape == "box":
             path = skia.Path().addRect(skia.Rect.MakeXYWH(x - 130, y - 80, 260, 160))
         else:
@@ -127,6 +135,9 @@ def board_notes(f, p):
     for i, (ln, t0) in enumerate(zip(lines, times)):
         y = y0 + i * gap
         bullet = f.prog(t0, 0.3)
+        if bullet <= 0:
+            f.c.drawCircle(210, y - 18, 12, paint(b["dim"], 0.7, stroke=4))
+            draw_partial(f, line_path([(260, y - 18), (260 + 620 - i * 60, y - 18)]), 1.0, paint(b["dim"], 0.5, stroke=8))
         if bullet > 0:
             f.c.drawCircle(210, y - 18, 10 * bullet, paint(b["colors"][i % 4], 0.9))
         w = write(f, b, ln["text"], 260, y, t0, size=64, align="left") or 0

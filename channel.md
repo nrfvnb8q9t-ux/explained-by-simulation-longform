@@ -72,8 +72,8 @@ close, the air vanishing, the Sun disappearing, Earth stopping spinning, Earth c
 new for that video's script. Reusing code tools is fine (a function that draws a planet); reusing their
 output (a rendered clip, a sound file) is not.
 
-- **Animations:** most scenes use one of 49 randomised templates (space simulations, whiteboard diagrams,
-  data reveals, cinematic titles), filled in with that scene's facts. The 3-6 hero moments per video get bespoke
+- **Animations:** most scenes use one of 73 randomised templates (detailed storyboard set pieces, space simulations, whiteboard diagrams,
+  data reveals, cinematic titles), filled in with that scene's facts. The 3-5 hero moments per video get bespoke
   animation code. A template never looks the same twice: layout, colours, camera and effects are seeded per video
 - **Whiteboard scenes:** diagrams drawn stroke by stroke on screen, with labels and arrows written in as the narrator explains
 - **VFX:** glows, shockwaves, particles, heat shimmer, starfields. Generated procedurally with that video's own seed and settings

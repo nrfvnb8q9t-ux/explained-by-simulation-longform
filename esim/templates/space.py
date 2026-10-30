@@ -5,7 +5,7 @@ import math
 import numpy as np
 import skia
 
-from esim.templates import (ACCENTS, Sfx, P, accent, body, draw_black_hole, pick, rand, shot_camera, template,
+from esim.templates import (ACCENTS, BODY_KINDS, Sfx, P, accent, body, draw_black_hole, pick, rand, shot_camera, template,
                             when)
 from esim.engine import *  # noqa: F401,F403
 
@@ -343,8 +343,10 @@ def light_travel(f, p):
     ax, bx, y = 300, 1620, 520
     col_ = accent(f, p, default=["gold", "cyan"])
     with shot_camera(f, p, strength=0.5):
-        body(f, p("a", "sun"), ax, y, 120)
-        body(f, p("b", "earth"), bx, y, 60, light=(-1, -0.2, 0.4))
+        # a body named only by its label ("Earth") is drawn as that body, not the default
+        guess = lambda lab, dflt: (lab or "").strip().lower().replace(" ", "_") if (lab or "").strip().lower().replace(" ", "_") in BODY_KINDS else dflt
+        body(f, p("a") or guess(p("a_label"), "sun"), ax, y, 120)
+        body(f, p("b") or guess(p("b_label"), "earth"), bx, y, 60, light=(-1, -0.2, 0.4))
         for x, lab in ((ax, p("a_label")), (bx, p("b_label"))):
             if lab:
                 text(f, lab, x, y + 200, size=44)

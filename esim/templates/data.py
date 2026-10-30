@@ -41,6 +41,19 @@ def chart_t(f, p):
     start = when(f, p("at"), 0.1) if p("at") else 0.4
     k = f.prog(start, max(f.dur - start - 1.5, 1.5))
     rect = (260, 260, 1400, 560)
+    gp = paint(DIM, 0.18, stroke=1)
+    for gx in range(9):
+        x = rect[0] + rect[2] * gx / 8
+        f.c.drawLine(x, rect[1], x, rect[1] + rect[3], gp)
+    for gy in range(5):
+        y = rect[1] + rect[3] * gy / 4
+        f.c.drawLine(rect[0], y, rect[0] + rect[2], y, gp)
+    if k < 1:  # the shape waits as a faint dotted ghost, and a scan line sweeps the plot until it draws
+        with layer(f, alpha=0.4):
+            line_chart(f, rect, vals, 1.0, color=c_, y_range=p("y_range"), title=p("title"))
+        sx = rect[0] + rect[2] * ((f.t * 0.35) % 1.0)
+        f.c.drawLine(sx, rect[1], sx, rect[1] + rect[3], paint(c_, 0.35, stroke=3))
+        soft_light(f, sx, rect[1] + rect[3] / 2, 160, c_, 0.18)
     with layer(f, alpha=f.prog(0, 0.5)):
         line_chart(f, rect, vals, k, color=c_, y_range=p("y_range"), x_labels=p("x_labels", []),
                    y_labels=p("y_labels", []), title=p("title"), zero_line=p("zero_line"))
@@ -80,7 +93,8 @@ def bars(f, p):
         f.c.drawRRect(rr, paint(c_ if top else DIM, 0.95 if top else 0.6))
         if top:
             soft_light(f, 590 + w, y + gap * 0.3, 80, c_, 0.4 * k)
-        text(f, _fmt(it["value"] * k, 0 if it["value"] >= 10 else 2) + p("unit", ""), 610 + w, y + gap * 0.45,
+        whole = float(it["value"]).is_integer()  # 3 stays "3", not "3.00"; 2.5 keeps its decimals
+        text(f, _fmt(it["value"] * k, 0 if whole or it["value"] >= 10 else 2) + p("unit", ""), 610 + w, y + gap * 0.45,
              size=min(40, gap * 0.4), align="left", weight="bold", a=clamp(k * 3))
     if use_log:
         text(f, "log scale", W - 60, H - 40, size=24, color=DIM, align="right", weight="body")
@@ -116,7 +130,7 @@ def big_number(f, p):
         ring(f, 960, 520, 200 + s * 900, 10, c_, 0.5 * clamp(1 - s))
 
 
-@template("rank_card", kind="data", sfx=lambda p: [Sfx("reverse", 0.4, dur=0.8), Sfx("808", 1.2), Sfx("pop", 1.8)])
+@template("rank_card", kind="data", sfx=lambda p: [Sfx("reverse", 0.0, dur=0.7), Sfx("808", 0.7), Sfx("pop", 1.0)])
 def rank_card(f, p):
     """A ranked-list entry: a huge '#3', the item's name, a spinning body and 1-3 quick facts.
     params: rank, name, kind (body to show, or none), facts [text] (0-3), color, background"""
@@ -127,11 +141,17 @@ def rank_card(f, p):
     tx = 160 if side == "left" else 1060
     if p("kind", "earth") != "none":
         with shot_camera(f, p, bx, 540, strength=0.4):
-            body(f, p("kind", "earth"), bx, 540, 260 * ease_back(f.prog(0.3, 0.9)), light=(-0.6, -0.3, 0.7))
-    slam_text(f, f"#{p('rank', 1)}", tx + 160, 330, 1.2, size=240, glow_color=c_, snap=True)
-    text(f, p("name", ""), tx, 560, size=78, align="left", a=f.prog(1.6, 0.4), weight="bold")
+            body(f, p("kind", "earth"), bx, 540, 260 * ease_back(f.prog(0.1, 0.8)), light=(-0.6, -0.3, 0.7))
+    else:  # no body: a glowing medal with the rank in it holds that side of the frame
+        pulse = f.beat_pulse()
+        soft_light(f, bx, 540, 420, c_, 0.25 + 0.15 * pulse)
+        for j, rr_ in enumerate((250, 205, 160)):
+            ring(f, bx, 540, rr_ + 8 * math.sin(f.t * 1.5 + j), 6 - j, c_, 0.55 - j * 0.12)
+        text(f, f"#{p('rank', 1)}", bx, 590, size=150, glow_color=c_, a=f.prog(0, 0.3))
+    slam_text(f, f"#{p('rank', 1)}", tx + 160, 330, 0.7, size=240, glow_color=c_, snap=True)
+    text(f, p("name", ""), tx, 560, size=78, align="left", a=f.prog(1.0, 0.4), weight="bold")
     for i, fact in enumerate(p("facts", [])[:3]):
-        text(f, "• " + fact, tx, 660 + i * 70, size=40, align="left", color=DIM, weight="semibold", a=f.prog(2.0 + i * 0.4, 0.4))
+        text(f, "• " + fact, tx, 660 + i * 70, size=40, align="left", color=DIM, weight="semibold", a=f.prog(1.4 + i * 0.4, 0.4))
 
 
 @template("countdown", kind="data", sfx=lambda p: [Sfx("tick", 0.5 + i * 0.5) for i in range(int(min(p("ticks", 6), 10)))])
@@ -199,7 +219,11 @@ def stat_grid(f, p):
         y = 560 + (r_ - (rows - 1) / 2) * (th + 50)
         t0 = f.time(s["at"]) if s.get("at") else 0.5 + i * 0.6
         k = f.prog(t0, 0.5, ease=ease_back)
-        if k <= 0:
+        if k <= 1e-3:  # placeholder tile (ease_back(0) is ~1e-16, not 0): the layout is there from the first frame
+            rr = skia.RRect.MakeRectXY(skia.Rect.MakeXYWH(x - tw / 2, y - th / 2, tw, th), 28, 28)
+            f.c.drawRRect(rr, paint("#000000", 0.45))
+            f.c.drawRRect(rr, paint(c_, 0.5 + 0.2 * f.beat_pulse(), stroke=4))
+            text(f, "?", x, y + 34, size=120, color=c_, a=0.6 + 0.2 * math.sin(f.t * 3 + i), glow_color=c_)
             continue
         f.c.save()
         f.c.translate(x, y)
@@ -284,9 +308,19 @@ def gauge(f, p):
     f.c.drawPath(fill, paint(c_, 0.4, stroke=56, add=True, cap_round=False))
     f.c.drawPath(fill, paint(c_, 1, stroke=30, cap_round=False))
     jitter = 0.6 * math.sin(f.t * 40) * clamp(k * 2) * (1 - k * 0.5)
+    # once it's arrived the needle stays alive: a slow wander and a flutter, like a real instrument under load
+    live = clamp(k * 1.5) * (3.0 * math.sin(f.t * 1.7) + 1.4 * math.sin(f.t * 5.3 + 1.0))
+    jitter += live
+    for tk in range(21):
+        ta = math.radians(180 + 9 * tk)
+        r0 = r + (28 if tk % 5 == 0 else 34)
+        f.c.drawLine(cx + math.cos(ta) * r0, cy + math.sin(ta) * r0, cx + math.cos(ta) * (r + 52), cy + math.sin(ta) * (r + 52),
+                     paint(INK if tk / 20 <= v / mx else DIM, 0.8 if tk % 5 == 0 else 0.45, stroke=5 if tk % 5 == 0 else 3))
+    soft_light(f, cx, cy - 40, 520, c_, 0.10 + 0.14 * f.beat_pulse() + 0.05 * math.sin(f.t * 2))
     ang = math.radians(180 + 180 * clamp(v / mx) + jitter)
     f.c.drawLine(cx, cy, cx + math.cos(ang) * (r - 60), cy + math.sin(ang) * (r - 60), paint(INK, 1, stroke=10))
     f.c.drawCircle(cx, cy, 26, paint(INK, 1))
-    text(f, f"{v:,.0f}{p('unit', '')}", cx, cy - 110, size=110, glow_color=c_)
+    shown = v * (1 + 0.004 * live) if k >= 1 else v  # the readout flickers with the needle
+    text(f, f"{shown:,.0f}{p('unit', '')}", cx, cy - 110, size=110, glow_color=c_)
     if p("caption"):
         text(f, p("caption"), cx, cy + 120, size=46, color=DIM, weight="semibold", a=f.prog(start + 1, 0.5))

@@ -101,9 +101,10 @@ def kinetic_text(f, p):
     for i, w in enumerate(words):
         t0 = f.next_beat(w["at"]) if w.get("at") and f.beats else (f.time(w["at"]) if w.get("at") else 0.3 + i * 0.35)
         s = f.t - t0
-        if s < 0:
-            continue
         x, y = pos[i]
+        if s < 0:  # not spoken yet: a dim outline holds its place
+            text(f, labels[i], x, y + size * 0.35, size=size, color=c_ if i == n - 1 else DIM, a=0.22, stroke=size * 0.03)
+            continue
         k = clamp(s / 0.12)
         sc = lerp(1.5, 1, ease_out(k))
         f.c.save()
@@ -270,7 +271,19 @@ def question_card(f, p):
     space(f, drift=(-3, 0))
     c_ = accent(f, p, default=["purple", "cyan", "pink"])
     q = p("question", "Why?")
-    pulse = 1 + 0.06 * f.beat_pulse() + 0.03 * math.sin(f.t * 3)
+    pulse = 1 + 0.06 * f.beat_pulse() + 0.03 * math.sin(f.t * 3) + 0.10 * f.p
+    rp = paint(c_, 0.35, stroke=4)
+    rp.setPathEffect(skia.DashPathEffect.Make([30, 22], f.t * 60))
+    f.c.drawCircle(960, 420, 330 + 15 * math.sin(f.t * 0.8), rp)
+    rp2 = paint(c_, 0.2, stroke=2)
+    rp2.setPathEffect(skia.DashPathEffect.Make([8, 18], -f.t * 40))
+    f.c.drawCircle(960, 420, 400, rp2)
+    rng = f.rng("q_embers")
+    n = 90
+    ex = rng.random(n) * 1920
+    ey = (rng.random(n) * 1000 - f.t * (25 + rng.random(n) * 50)) % 1000
+    dots(f, ex, ey, 1.5 + rng.random(n) * 3, 0.25 + 0.4 * rng.random(n), color=c_)
+    soft_light(f, 960, 420, 420, c_, 0.12 + 0.12 * f.beat_pulse())
     f.c.save()
     f.c.translate(960, 420)
     f.c.scale(pulse * ease_back(f.prog(0.6, 0.6)), pulse * ease_back(f.prog(0.6, 0.6)))
