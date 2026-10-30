@@ -161,7 +161,7 @@ def size_scale(f, p):
 
     def rad(b):
         v = b.get("radius_km", 1)
-        return 40 + 310 * (math.log(v) / math.log(biggest) if use_log else v / biggest)
+        return 40 + 230 * (math.log(v) / math.log(biggest) if use_log else v / biggest)
 
     xs, x = [], 200
     for b in items:
@@ -171,17 +171,18 @@ def size_scale(f, p):
         x += r + 120
     span = max(x - 200, W)
     pan = lerp(0, span - W + 200, ease_in_out(f.p)) if span > W else 0
-    zoom = lerp(1.25, 0.95, ease_in_out(f.p)) if span <= W else 1.0
-    with camera(f, W / 2 + pan, 500, zoom=zoom):
+    zoom = lerp(1.1, 0.95, ease_in_out(f.p)) if span <= W else 1.0
+    cy = 430  # bodies sit high enough that their labels stay above the caption strip
+    with camera(f, W / 2 + pan, cy, zoom=zoom):
         for i, (b, cx) in enumerate(zip(items, xs)):
             r = rad(b)
             a = f.prog(0.4 + i * 0.6, 0.6)
-            body(f, b.get("kind", "rocky"), cx, 500, r * lerp(0.6, 1, ease_back(a)), light=(-0.6, -0.3, 0.7), alpha=a)
-            text(f, b.get("label", ""), cx, 500 + r + 70, size=44, a=a)
+            body(f, b.get("kind", "rocky"), cx, cy, r * lerp(0.6, 1, ease_back(a)), light=(-0.6, -0.3, 0.7), alpha=a)
+            text(f, b.get("label", ""), cx, cy + r + 64, size=44, a=a)
             if b.get("radius_km"):
-                text(f, f"{b['radius_km']:,} km radius", cx, 500 + r + 118, size=28, color=DIM, weight="body", a=a)
+                text(f, f"{b['radius_km']:,} km radius", cx, cy + r + 108, size=30, color=DIM, weight="body", a=a)
     if use_log:
-        text(f, "sizes on a log scale", 40, H - 36, size=24, color=DIM, align="left", weight="body", a=0.7)
+        text(f, "sizes on a log scale", 120, 90, size=30, color=DIM, align="left", weight="body", a=0.7)
 
 
 # ---------------------------------------------------------------- 5. impact
@@ -345,8 +346,8 @@ def light_travel(f, p):
     with shot_camera(f, p, strength=0.5):
         # a body named only by its label ("Earth") is drawn as that body, not the default
         guess = lambda lab, dflt: (lab or "").strip().lower().replace(" ", "_") if (lab or "").strip().lower().replace(" ", "_") in BODY_KINDS else dflt
-        body(f, p("a") or guess(p("a_label"), "sun"), ax, y, 120)
-        body(f, p("b") or guess(p("b_label"), "earth"), bx, y, 60, light=(-1, -0.2, 0.4))
+        body(f, guess(p("a_label"), p("a") or "sun"), ax, y, 120)
+        body(f, guess(p("b_label"), p("b") or "earth"), bx, y, 60, light=(-1, -0.2, 0.4))
         for x, lab in ((ax, p("a_label")), (bx, p("b_label"))):
             if lab:
                 text(f, lab, x, y + 200, size=44)
