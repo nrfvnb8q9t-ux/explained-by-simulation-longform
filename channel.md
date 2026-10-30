@@ -3,20 +3,45 @@
 Every yt-* skill reads this file first. Keep it current: a consistent channel is what YouTube's
 monetisation reviewers want to see.
 
-## Niche
-Real science, impossible scenarios, visualised. Long-form "what if" videos about space and physics:
-take one impossible scenario and follow it step by step using real physics, from the first second
-to millions of years later. This is the long-form version of the channel's Shorts.
+## Niche: real science, chaotic scenarios
+Unhinged "what if" scenarios, answered with real physics and visualised. Take one absurd, funny or extreme
+premise (a kid would ask it, a scientist would secretly love it) and follow it step by step with real
+science, from the first second to millions of years later. The science is always real; the premise is
+allowed to be ridiculous. This is the long-form version of the channel's Shorts.
+
+**Every topic must pass the scroll test:**
+1. **The premise alone is a reaction.** Someone scrolling sees the title and thinks "wait, WHAT?" or laughs.
+   A dry textbook question ("Why does Venus spin backwards?", "Ways to detect alien life") fails unless it's
+   re-pitched as something chaotic ("What If Earth Started Spinning Backwards Tomorrow?").
+2. **It's concrete and visual.** One object, one action, one absurd twist: "What If You Dropped a Teaspoon of
+   Neutron Star on Earth?", not "Neutron stars explained".
+3. **It has escalation.** It starts weird and gets more insane every few minutes, ending somewhere nobody
+   expected.
+4. **Real physics answers it.** Each step can be worked out or sourced. Absurd premise, honest answer.
+5. **All ages.** It's funny or awe-inspiring, never grim. Destruction is cartoonish-epic physics, not suffering.
+
+**Topic ideas in the right spirit** (use them as inspiration, not a list to work through):
+- **Absurd swaps:** Earth made of popcorn, the Moon replaced by Jupiter, oceans of lemonade, a sun made of ice.
+- **Everyone does one thing:** every human jumps at once, everyone flushes at once, all 8 billion people
+  stand in one spot.
+- **Ridiculous objects:** a teaspoon of neutron star, a black hole the size of a marble in your pocket, a
+  sandwich at light speed, a microwave the size of the Moon.
+- **Survival challenges:** "How long could you survive...", on every planet, inside the Sun, in a bathtub
+  of liquid nitrogen.
+- **Extreme numbers:** the loudest sound possible, the hottest thing ever made, falling forever, a mountain
+  10x Everest.
+- **Chaotic versus:** you vs a tornado on Jupiter, a T. rex on the Moon, a bullet vs a rail gun vs light.
 
 ## Search terms for research
-what if the sun disappeared
-what would happen if earth
-space what if documentary
-physics what if scenario
-what if the moon
-<!-- Rotate in later:
-black hole what would happen
+what if earth was made of
+what would happen if you
+what if every human
+how long could you survive
 what if you fell into
+<!-- Rotate in later:
+craziest science experiment
+what if the moon
+what if you dropped
 -->
 
 ## Suitable for all ages
@@ -32,8 +57,10 @@ scientists, so everything has to make sense by ear, without equations on screen.
 ## Narrator
 - **Voice: `am_puck`.** Every video uses it, so the channel has one recognisable narrator. The other
   approved voices are `af_heart` and `am_michael`. To switch, change it here, and new scripts will use it.
-- **Persona:** a punchy, confident guide who walks the viewer through the scenario as it unfolds: "Ten
-  seconds in, you'd notice..." Short, hard-hitting lines on the big moments ("No explosion. No warning.
+- **Persona:** a punchy, confident, slightly unhinged guide who walks the viewer through the chaos as it
+  unfolds: "Ten seconds in, you'd notice...". They enjoy the absurdity: quick dry jokes, mock-serious
+  understatement ("This is, scientifically speaking, a problem."), and callbacks to the ridiculous premise.
+  They never undercut the real science. Short, hard-hitting lines on the big moments ("No explosion. No warning.
   Just... gone."), with everyday comparisons ("as heavy as 40 elephants", "faster than a rifle bullet").
   The hype is in the delivery and the edit, never in the facts: clearly separate what physics predicts
   from what's educated guessing.
@@ -59,13 +86,25 @@ scientists, so everything has to make sense by ear, without equations on screen.
 
 ## Formats to rotate
 Rotate through these so the channel doesn't look mass-produced:
-1. Timeline what-if: one scenario followed from 1 second to 1 billion years ("What If the Sun Disappeared?")
-2. Ranked: counting down to the most extreme ("Every Planet Ranked by How Fast It Would Kill You")
-3. Versus: two scenarios or worlds compared, with a clear verdict ("Falling Into Jupiter vs Falling Into the Sun")
-4. Real mystery: a genuine open question, investigated with what science currently knows ("Why Is Venus Spinning Backwards?")
+1. **Chaos timeline:** one absurd scenario from 1 second to 1 billion years ("What If Earth Was Made of Popcorn?")
+2. **Survival challenge:** how long you'd last, getting worse and worse ("How Long Could You Survive Inside a Tornado on Jupiter?")
+3. **Ridiculous versus:** two absurd things fight with real physics, and there's a clear winner ("A Raindrop on Venus vs a Raindrop on Titan")
+4. **Insane ranked:** a countdown that gets more unhinged ("Every Way to Destroy Earth, Ranked by How Ridiculous It Is")
+5. **Real mystery, chaotic angle:** a genuine open question pitched as a shocking premise ("Something Is Making Stars Vanish and Nobody Knows What")
 
 Good fits for long versions of existing Shorts: the Sun going boom, jumping on Pluto, the Moon twice as
 close, the air vanishing, the Sun disappearing, Earth stopping spinning, Earth collapsing into a black hole.
+Push each one weirder ("What If You Jumped on Pluto... Holding a Leaf Blower?").
+
+## Titles: built for the scroll
+- **Under 55 characters**, so the whole title shows on a phone.
+- **The absurd image comes first:** "What If You Swallowed a Black Hole?" rather than "Black Holes: What Would Happen If...".
+- **One CAPITALISED word at most**, for the twist ("What If Earth Spun BACKWARDS?"). No emojis, no all-caps titles.
+- **Curiosity gap or stakes:** a number, an extreme, or a "nobody expected this" angle ("Why 8 Billion People
+  Jumping at Once Does... Nothing").
+- **Honest:** the video must actually deliver the premise. Absurd is good; misleading is not.
+- **Dry titles are banned.** No "Explained", no "Ranked by Detectability", no "The Science of", and no
+  question a textbook chapter would use as its heading.
 
 ## Visuals and sound: every video is 100% unique
 **Nothing rendered gets reused between videos.** Every animation, effect, sound and drawing is generated

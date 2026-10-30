@@ -33,11 +33,16 @@ Each scene is one visual idea the animator can build. End a scene where the pict
 - Write numbers the way they should be spoken ("eight minutes and twenty seconds", "minus seventy three").
   The voice reads exactly what's written.
 - Use short sentences. Put the word that matters most where a visual can land on it ("...and then it **explodes**.").
+- **Have fun with it.** The tone is chaotic science: play the absurd premise straight with deadpan jokes
+  ("This is, scientifically speaking, a problem."), callbacks to the ridiculous setup, and escalation where each
+  chapter is more unhinged than the last. Every joke sits on top of a real number or a real mechanism, never
+  in place of one. Keep it all-ages: silly and epic, never grim.
 - Give each scene a `mood` (`wonder`, `calm`, `tense`, `mystery`, `epic`) and an `intensity` from 0 to 1.
   The music and the edit follow them (see "Edit style" in `channel.md`):
   - 0.6+ is a **hype** scene: high-energy music, with beat punches, flashes and slam text.
   - Under 0.35 is a **breather**: whiteboard explanations, charts, calmer music.
-  - The hook (scene 1) is always hype, and it ends on a shocking fact or image within 20 seconds.
+  - The hook (scene 1) is always hype. It states the absurd premise in the first sentence and ends on a
+    shocking fact or image within 20 seconds.
   - **A shock drop every 60-90 seconds.** That's a jaw-dropping fact revealed on one word ("...and it would be
     **one million** times brighter than the Sun"). Build up to it for 1-2 sentences first ("Here's where it gets
     insane.", "Now look at the number."), put the `drop` on the reveal word, and use the `reveal` template or a
@@ -102,8 +107,10 @@ you write the shots.
   `"captions": false` only to a scene whose own on-screen text would clash.
 
 **Packaging:**
-- 5 title options (under 70 characters, strongest first). Use different formulas, front-load the most
-  interesting word, and make sure each one matches what the video actually delivers.
+- 5 title options following **"Titles: built for the scroll" in `channel.md`**: under 55 characters, the
+  absurd image first, at most one CAPITALISED word, strongest first, each using a different formula, all
+  honest about what the video delivers. If the plan's working title is dry, write better ones. You may
+  sharpen the premise itself, as long as the physics still holds.
 - Thumbnail: which scene and which word to freeze on (pick a dramatic moment), plus 2-4 words of big text
   that add to the title rather than repeating it.
 - Description: the first two lines restate the hook (they show in search). The renderer adds the chapters,

@@ -20,6 +20,16 @@ Do these in order, then stop:
    `error_log`, fix it (usually a word in an `at` field that isn't in the narration, a bad template param, or a
    hero scene bug; if the uniqueness check blocked it, swap some shots for different templates or settings),
    test with `uv run python -m esim.render videos/<slug> --preview --scenes <ids>`, and set it back to `"scripted"`.
+1b. **Make every topic pass the scroll test** (see "Niche" and "Titles: built for the scroll" in `channel.md`).
+   This is a one-off clean-up, and items that already have `"chaos_checked": true` are skipped:
+   - **`"planned"` items:** if the working title or angle is dry or textbook-like, re-pitch it into a chaotic,
+     absurd or extreme premise on the same or a nearby piece of real science, with a new `working_title`
+     (written as the final YouTube title) and a new `angle`. You may change the slug when nothing has been
+     scripted for it. Drop and replace any idea that can't be made exciting, and keep the format rotation.
+   - **`"scripted"` items:** don't touch the narration or scenes. Only rewrite `long.titles` (5 options,
+     strongest first) and the thumbnail text in `videos/<slug>/script.json`, so they follow the title rules and
+     still honestly describe the video.
+   - Set `"chaos_checked": true` on every item you've reviewed, including ones that were already fine.
 2. **Keep the plan full.** If fewer than 14 items are `"planned"`:
    - If the newest `research/*-outliers.md` is missing or over 30 days old, run yt-outlier-research
      first (it needs `YOUTUBE_API_KEY`; if that's missing, plan from channel.md alone).
