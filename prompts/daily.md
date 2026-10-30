@@ -23,7 +23,7 @@ Do these in order, then stop:
 1b. **Make every topic pass the scroll test** (see "Niche" and "Titles: built for the scroll" in `channel.md`).
    This is a one-off clean-up, and items that already have `"chaos_checked": true` are skipped:
    - **`"planned"` items:** if the working title or angle is dry or textbook-like, re-pitch it into a chaotic,
-     absurd or extreme premise on the same or a nearby piece of real science, with a new `working_title`
+     wild-but-relatable premise (close to home, never far-fetched) on the same or a nearby piece of real science, with a new `working_title`
      (written as the final YouTube title) and a new `angle`. You may change the slug when nothing has been
      scripted for it. Drop and replace any idea that can't be made exciting, and keep the format rotation.
    - **`"scripted"` items:** don't touch the narration or scenes. Only rewrite `long.titles` (5 options,

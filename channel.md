@@ -4,33 +4,39 @@ Every yt-* skill reads this file first. Keep it current: a consistent channel is
 monetisation reviewers want to see.
 
 ## Niche: real science, chaotic scenarios
-Unhinged "what if" scenarios, answered with real physics and visualised. Take one absurd, funny or extreme
-premise (a kid would ask it, a scientist would secretly love it) and follow it step by step with real
-science, from the first second to millions of years later. The science is always real; the premise is
-allowed to be ridiculous. This is the long-form version of the channel's Shorts.
+Wild but relatable "what if" scenarios, answered with real physics and visualised. Take one funny,
+surprising premise that starts **close to home** (your house, your body, your food, your street, Earth, the
+Moon, the Sun) and follow it step by step with real science, from the first second to millions of years
+later. The science is always real, and the premise is a bit chaotic without being far-fetched. This is the
+long-form version of the channel's Shorts.
 
 **Every topic must pass the scroll test:**
 1. **The premise alone is a reaction.** Someone scrolling sees the title and thinks "wait, WHAT?" or laughs.
    A dry textbook question ("Why does Venus spin backwards?", "Ways to detect alien life") fails unless it's
    re-pitched as something chaotic ("What If Earth Started Spinning Backwards Tomorrow?").
-2. **It's concrete and visual.** One object, one action, one absurd twist: "What If You Dropped a Teaspoon of
-   Neutron Star on Earth?", not "Neutron stars explained".
-3. **It has escalation.** It starts weird and gets more insane every few minutes, ending somewhere nobody
+2. **It's relatable.** It starts from something everyone knows (gravity, the Moon, the sea, a day, a jump, a
+   phone, a sandwich) and gives it one twist. Viewers should picture it happening on their own street.
+   Far-off exotic settings ("a tornado on Jupiter", "surviving inside the Sun") are too far-fetched. Bring
+   space to Earth instead ("What If a Piece of the Sun Landed in Your Garden?").
+3. **It's concrete and visual.** One object, one action, one twist.
+4. **It has escalation.** It starts weird and gets more insane every few minutes, ending somewhere nobody
    expected.
-4. **Real physics answers it.** Each step can be worked out or sourced. Absurd premise, honest answer.
-5. **All ages.** It's funny or awe-inspiring, never grim. Destruction is cartoonish-epic physics, not suffering.
+5. **Real physics answers it.** Each step can be worked out or sourced. Funny premise, honest answer.
+6. **All ages.** It's funny or awe-inspiring, never grim. Destruction is cartoonish-epic physics, not suffering.
 
-**Topic ideas in the right spirit** (use them as inspiration, not a list to work through):
-- **Absurd swaps:** Earth made of popcorn, the Moon replaced by Jupiter, oceans of lemonade, a sun made of ice.
+**Topic ideas in the right spirit: wild but close to home** (use them as inspiration, not a list to work through):
+- **Everyday things with one twist:** gravity switching off for 5 seconds, the Moon being twice as close,
+  days lasting a week, the oceans draining overnight, all the ice on Earth melting at once.
 - **Everyone does one thing:** every human jumps at once, everyone flushes at once, all 8 billion people
   stand in one spot.
-- **Ridiculous objects:** a teaspoon of neutron star, a black hole the size of a marble in your pocket, a
-  sandwich at light speed, a microwave the size of the Moon.
-- **Survival challenges:** "How long could you survive...", on every planet, inside the Sun, in a bathtub
-  of liquid nitrogen.
-- **Extreme numbers:** the loudest sound possible, the hottest thing ever made, falling forever, a mountain
-  10x Everest.
-- **Chaotic versus:** you vs a tornado on Jupiter, a T. rex on the Moon, a bullet vs a rail gun vs light.
+- **You and your body:** never sleeping again, falling through a hole to the other side of Earth, shrinking
+  to the size of an ant, holding your breath in space.
+- **Space comes to Earth:** a teaspoon of neutron star in your kitchen, a meteor the size of a car heading for
+  your town, the Sun switching off for one hour.
+- **Extreme but real:** the loudest sound ever heard on Earth, the deepest hole ever dug, the hottest day ever
+  recorded, a skydive from the edge of space.
+- **Relatable versus:** jumping on the Moon vs on Mars, a lightning strike vs a nuclear power plant, falling
+  into the sea vs onto the Moon.
 
 ## Search terms for research
 what if earth was made of
@@ -86,19 +92,19 @@ scientists, so everything has to make sense by ear, without equations on screen.
 
 ## Formats to rotate
 Rotate through these so the channel doesn't look mass-produced:
-1. **Chaos timeline:** one absurd scenario from 1 second to 1 billion years ("What If Earth Was Made of Popcorn?")
-2. **Survival challenge:** how long you'd last, getting worse and worse ("How Long Could You Survive Inside a Tornado on Jupiter?")
-3. **Ridiculous versus:** two absurd things fight with real physics, and there's a clear winner ("A Raindrop on Venus vs a Raindrop on Titan")
-4. **Insane ranked:** a countdown that gets more unhinged ("Every Way to Destroy Earth, Ranked by How Ridiculous It Is")
-5. **Real mystery, chaotic angle:** a genuine open question pitched as a shocking premise ("Something Is Making Stars Vanish and Nobody Knows What")
+1. **Chaos timeline:** one wild scenario from 1 second to 1 billion years ("What If Gravity Switched Off for 5 Seconds?")
+2. **Survival challenge:** how long you'd last, getting worse and worse ("How Long Could You Survive Without Sleep?")
+3. **Relatable versus:** two familiar things go head to head with real physics, and there's a clear winner ("Jumping on the Moon vs Jumping on Mars")
+4. **Wild ranked:** a countdown that gets crazier ("Every Way the Moon Could Ruin Your Day, Ranked")
+5. **Real mystery, close to home:** a genuine open question that affects us ("Earth Is Humming and Nobody Knows Why")
 
 Good fits for long versions of existing Shorts: the Sun going boom, jumping on Pluto, the Moon twice as
 close, the air vanishing, the Sun disappearing, Earth stopping spinning, Earth collapsing into a black hole.
-Push each one weirder ("What If You Jumped on Pluto... Holding a Leaf Blower?").
+Give each one a funny, relatable twist ("What If the Moon Was as Close as a Plane?").
 
 ## Titles: built for the scroll
 - **Under 55 characters**, so the whole title shows on a phone.
-- **The absurd image comes first:** "What If You Swallowed a Black Hole?" rather than "Black Holes: What Would Happen If...".
+- **The absurd image comes first:** "What If the Moon Fell Into the Sea?" rather than "The Moon: What Would Happen If...".
 - **One CAPITALISED word at most**, for the twist ("What If Earth Spun BACKWARDS?"). No emojis, no all-caps titles.
 - **Curiosity gap or stakes:** a number, an extreme, or a "nobody expected this" angle ("Why 8 Billion People
   Jumping at Once Does... Nothing").

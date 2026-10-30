@@ -17,11 +17,12 @@ description: Plan a month (or any number of days) of long-form YouTube videos, o
 
 ## Plan
 
-**First filter: the scroll test in `channel.md`.** Every idea must have a chaotic, absurd or extreme premise
-that makes someone scrolling stop ("wait, WHAT?"), a concrete visual, escalation, a real-physics answer,
-and all-ages fun. Write the working title the way it will appear on YouTube, following the title rules in
+**First filter: the scroll test in `channel.md`.** Every idea needs a wild but relatable premise that starts
+close to home (everyday life, your body, Earth, the Moon, the Sun) and makes someone scrolling stop ("wait,
+WHAT?"). It also needs a concrete visual, escalation, a real-physics answer and all-ages fun. Nothing
+far-fetched: if viewers can't picture it on their own street, bring it closer to home. Write the working title the way it will appear on YouTube, following the title rules in
 `channel.md`. If the working title sounds like a textbook heading, re-pitch it or drop it. For balance,
-aim for about 70% absurd or chaotic premises and about 30% real mysteries, re-pitched with a shocking angle.
+aim for about 70% wild "what if" premises and about 30% real mysteries close to home, each with a shocking angle.
 
 Then use the research to rank the ideas that survive. An idea is strong when:
 - **It's proven.** It follows the pattern of at least one outlier (title formula, topic type, length).
